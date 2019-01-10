@@ -1,0 +1,27 @@
+{
+  "name": "@lblod/marawa",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/redpencilio/marawa.git"
+  },
+  "keywords": [
+    "rdf",
+    "rdfa"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/redpencilio/marawa/issues"
+  },
+  "homepage": "https://github.com/redpencilio/marawa#readme",
+  "description": "",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0"
+  }
+}
