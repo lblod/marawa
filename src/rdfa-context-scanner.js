@@ -1,6 +1,6 @@
-const { get, set, warn } = require('./ember-object-mock');
-const { rdfaKeywords, prefixableRdfaKeywords, defaultPrefixes } = require('./support/rdfa-config');
-const { walk } = require('./node-walker');
+import { get, set, warn } from './ember-object-mock';
+import { rdfaKeywords, prefixableRdfaKeywords, defaultPrefixes } from './support/rdfa-config';
+import { walk } from './node-walker';
 
 /**
  * Resolves the URIs in an RDFa attributes object with the correct prefix
@@ -687,7 +687,7 @@ class RdfaContextScanner {
  * Shorthand form for creating a new RdfaContextScanner and analysing the supplied node with it.
  *
  * @method analyse
- * 
+ *
  * @param {Node} node Node to be analysed
  *
  * @return {[RichNode]} RichNodes containing the analysed node
@@ -696,4 +696,5 @@ function analyse(node){
   return (new RdfaContextScanner()).analyse( node, [ 0, 1000000] );
 }
 
-exports = {default: RdfaContextScanner, analyse , resolvePrefixes };
+export default RdfaContextScanner;
+export { analyse , resolvePrefixes };

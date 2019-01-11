@@ -1,5 +1,5 @@
-const RichNode = require('./rich-node');
-const {get, set} = require('./ember-object-mock');
+import RichNode from './rich-node';
+import {get, set} from './ember-object-mock';
 
 if( ! Node ) {
   var Node = { ATTRIBUTE_NODE: 2,
@@ -149,5 +149,5 @@ function walk(node) {
   return NW.processDomNode( node );
 }
 
-exports.default = NodeWalker;
-exports.walk = walk;
+export default NodeWalker;
+export { walk };

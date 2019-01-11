@@ -1,27 +1,41 @@
 {
   "name": "@lblod/marawa",
-  "version": "0.0.1",
-  "main": "index.js",
+  "version": "0.0.4",
+  "main": "dist",
+  "module": "src",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --compilers js:babel-register",
+    "prepare": "rm -rf dist && babel src --out-dir dist",
+    "prepublish": "rm -rf dist && babel src --out-dir dist"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/redpencilio/marawa.git"
+    "url": "git+ssh://git@github.com/lblod/marawa.git"
   },
   "keywords": [
     "rdf",
     "rdfa"
   ],
   "author": "",
+  "babel": {
+    "presets": [
+      "es2015"
+    ],
+    "plugins": [
+      "add-module-exports"
+    ]
+  },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/redpencilio/marawa/issues"
+    "url": "https://github.com/redpencilio/lblod/issues"
   },
-  "homepage": "https://github.com/redpencilio/marawa#readme",
+  "homepage": "https://github.com/redpencilio/lblod#readme",
   "description": "",
-  "devDependencies": {
+  "dependencies": {
     "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.7.0"
+    "babel-preset-env": "^1.7.0",
+    "babel-plugin-add-module-exports": "^1.0.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-register": "^6.26.0"
   }
 }

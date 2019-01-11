@@ -11,4 +11,4 @@ function warn( string ) {
 };
 
 
-exports = { get, set, warn };
+export { get, set, warn };

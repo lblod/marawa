@@ -1,4 +1,4 @@
-const {get, set} = require('./ember-object-mock');
+import {get, set} from './ember-object-mock';
 
 /**
  * Represents an enriched DOM node.
@@ -35,4 +35,4 @@ class RichNode {
   }
 }
 
-exports.default = RichNode;
+export default  RichNode;
