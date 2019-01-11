@@ -62,4 +62,4 @@ const defaultPrefixes = {
   schema:	"http://schema.org/"
 };
 
-exports = { rdfaKeywords, prefixableRdfaKeywords, defaultPrefixes };
+export { rdfaKeywords, prefixableRdfaKeywords, defaultPrefixes };
