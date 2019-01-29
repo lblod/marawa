@@ -1,6 +1,6 @@
 {
   "name": "@lblod/marawa",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "main": "dist",
   "module": "src",
   "scripts": {
