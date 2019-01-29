@@ -1,4 +1,4 @@
-o/**
+/**
  * Helpers for maintaining a DOM tree.
  */
 
