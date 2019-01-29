@@ -1,10 +1,10 @@
-/**
+o/**
  * Helpers for maintaining a DOM tree.
  */
 
 import { analyse as analyseContexts,
          resolvePrefixes
-       } from '@lblod/marawa/rdfa-context-scanner';
+       } from './rdfa-context-scanner';
 
 /**
  * Finds the first dom node with the supplied type
