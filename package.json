@@ -1,12 +1,11 @@
 {
   "name": "@lblod/marawa",
-  "version": "0.0.8",
-  "main": "dist",
+  "version": "0.1.0",
   "module": "src",
   "scripts": {
     "test": "mocha --compilers js:babel-register",
-    "prepare": "rm -rf dist && babel src --out-dir dist",
-    "prepublish": "rm -rf dist && babel src --out-dir dist"
+    "prepare": "rm -rf dist && babel src --out-dir ./",
+    "prepublish": "rm -rf dist && babel src --out-dir ./"
   },
   "repository": {
     "type": "git",
