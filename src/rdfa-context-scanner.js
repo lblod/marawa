@@ -1,6 +1,24 @@
-import { get, set, warn } from './ember-object-mock';
+import { set, warn } from './ember-object-mock';
 import { rdfaKeywords, prefixableRdfaKeywords, defaultPrefixes } from './support/rdfa-config';
 import { walk } from './node-walker';
+
+// TODO: Research a way to alter the imports when used in an Ember application
+
+/**
+ * Returns whether if range [x, y] (partially) falls in region [start, end]
+ *
+ * @method isInRange
+ *
+ * @private
+ */
+const isInRange = function([x, y], [start, end]) {
+  if (start == undefined || end == undefined)
+    return true;
+
+  return (x >= start && x <= end)
+      || (y >= start && y <= end)
+      || (x <= start && end <= y);
+};
 
 /**
  * Resolves the URIs in an RDFa attributes object with the correct prefix
@@ -112,7 +130,8 @@ class RdfaContextScanner {
    * @method analyse
    *
    * @param {Node} domNode Root DOM node containing the text
-   * @param {[number,number]} region Region in the text for which RDFa contexts must be calculated
+   * @param {[number,number]} region Region in the text for which RDFa contexts must be calculated.
+   *                                 Full region if start or end is undefined.
    *
    * @return {Array} Array of contexts mapping text parts from the specified region to their RDFa context
    *               A context element consists of:
@@ -122,17 +141,34 @@ class RdfaContextScanner {
    *
    * @public
    */
-  analyse(domNode, [start, end]) {
+  analyse(domNode, [start, end] = []) {
     if (domNode == null || start < 0 || end < start)
       return [];
 
-    const richNode = walk( domNode );
+    const richNode = walk(domNode);
 
     this.enrichRichNodeWithRdfa(richNode);
-    const rootRdfa = this.calculateRdfaToTop(richNode);
-    this.expandRdfaContext(richNode, rootRdfa.context, rootRdfa.prefixes);
 
-    return this.flattenRdfaTree(richNode, [start, end]);
+    const rootRdfa = this.calculateRdfaToTop(richNode);
+    this.expandRdfaContext( richNode, rootRdfa.context, rootRdfa.prefixes );
+
+    const rdfaBlocks = this.flattenRdfaTree(richNode, [start, end]);
+
+    let resultingBlocks;
+
+    // TODO is this still required since we already take start/end into account in flattenRdfaTree
+    if (start && end) {
+      resultingBlocks =
+        rdfaBlocks.filter( (b) => isInRange([b.start, b.end], [start, end]) );
+    } else {
+      resultingBlocks = rdfaBlocks;
+    }
+
+    return resultingBlocks.map( (b) => {
+      // make sure contexts have a region
+      this.set( b, 'region', [b.start, b.end] );
+      return b;
+    } );
   }
 
   /**
@@ -143,13 +179,13 @@ class RdfaContextScanner {
    * @param {RichNode} richNode Rich node to enrich with its RDFa attributes
    *
    * @private
-  */
+   */
   enrichRichNodeWithRdfa(richNode) {
-    const rdfaAttributes = this.getRdfaAttributes(get(richNode, 'domNode'));
-    set( richNode, 'rdfaAttributes', rdfaAttributes);
+    const rdfaAttributes = this.getRdfaAttributes(richNode.domNode);
+    this.set( richNode, 'rdfaAttributes', rdfaAttributes);
 
-    if (get(richNode, 'children')) {
-      get(richNode, 'children').forEach((child) => {
+    if (richNode.children) {
+      richNode.children.forEach((child) => {
         this.enrichRichNodeWithRdfa(child);
       });
     }
@@ -165,13 +201,13 @@ class RdfaContextScanner {
    * @return {Object} Object containing the RDFa context and prefixes uptil the given node
    *
    * @private
-  */
+   */
   calculateRdfaToTop(richNode) {
     const rootContext = [];
     const resolvedRootContext = [];
     let rootPrefixes = defaultPrefixes;
 
-    const startNode = get(richNode, 'domNode');
+    const startNode = richNode.domNode;
 
     if (startNode.parentNode) { // start 1 level above the rootNode of the NodeWalker
       for(let node = startNode.parentNode; node.parentNode; node = node.parentNode) {
@@ -207,25 +243,25 @@ class RdfaContextScanner {
    * @param {Object} parentPrefixes RDFa prefixes defined at the node's parent level
    *
    * @private
-  */
+   */
   expandRdfaContext(richNode, parentContext, parentPrefixes) {
-    const nodeRdfaAttributes = get(richNode, 'rdfaAttributes');
+    const nodeRdfaAttributes = richNode.rdfaAttributes;
 
     const prefixes = this.mergePrefixes(parentPrefixes, nodeRdfaAttributes);
-    set(richNode, 'rdfaPrefixes', prefixes);
+    this.set(richNode, 'rdfaPrefixes', prefixes);
 
     if (!this.isEmptyRdfaAttributes(nodeRdfaAttributes)) {
       const resolvedRdfaAttributes = resolvePrefixes(nodeRdfaAttributes, prefixes);
-      set(richNode, 'rdfaContext', parentContext.concat(resolvedRdfaAttributes));
+      this.set(richNode, 'rdfaContext', parentContext.concat(resolvedRdfaAttributes));
     }
     else {
-      set(richNode, 'rdfaContext', parentContext);
+      this.set(richNode, 'rdfaContext', parentContext);
     }
 
-    if (get(richNode, 'children')) {
-      get(richNode, 'children').forEach((child) => {
-        const context = get(richNode, 'rdfaContext');
-        const prefixes = get(richNode, 'rdfaPrefixes');
+    if (richNode.children) {
+      richNode.children.forEach((child) => {
+        const context = richNode.rdfaContext;
+        const prefixes = richNode.rdfaPrefixes;
 
         this.expandRdfaContext(child, context, prefixes);
       });
@@ -299,29 +335,41 @@ class RdfaContextScanner {
    * @private
    */
   flattenRdfaTree(richNode, [start, end]) {
-    // TODO take [start, end] argumentns into account
-
     // ran before processing the current node
     const preprocessNode = (richNode) => {
       // does this node represent a logical block of content?
-      set(richNode, 'isLogicalBlock', this.nodeIsLogicalBlock( richNode ));
+      this.set(richNode, 'isLogicalBlock', this.nodeIsLogicalBlock( richNode ));
     };
 
     // ran when processing a single child node
     const processChildNode = (node) => {
-      this.flattenRdfaTree( node, [ start, end ] );
+      if (isInRange([node.start, node.end], [start, end])) {
+        this.flattenRdfaTree( node, [ start, end ] );
+      } else {
+        this.set(node, 'isLogicalBlock', false);
+        this.set(node, 'isRdfaBlock', false);
+        this.set(node, 'rdfaBlockList', []);
+      }
+
     };
 
     // ran when we're finished processing all child nodes
     const finishChildSteps = (node) => {
-      set( node, 'rdfaBlocks', this.getRdfaBlockList( node ) );
+      let rdfaBlockList = [];
+      if (isInRange([node.start, node.end], [start, end])) {
+        rdfaBlockList = this.getRdfaBlockList( node );
+      } else {
+        rdfaBlockList = [];
+      }
+
+      this.set( node, 'rdfaBlocks', rdfaBlockList );
     };
 
     preprocessNode(richNode);
-    (get(richNode, 'children') || []).map( (node) => processChildNode(node) );
+    (richNode.children || []).map( (node) => processChildNode(node) );
     finishChildSteps( richNode );
 
-    return get(richNode, 'rdfaBlocks');
+    return richNode.rdfaBlocks;
   }
 
   /**
@@ -338,13 +386,13 @@ class RdfaContextScanner {
    * @private
    */
   getRdfaBlockList( richNode ){
-    switch( get( richNode, 'type' ) ){
-    case "text":
-      return this.createRdfaBlocksFromText( richNode );
-    case "tag":
-      return this.createRdfaBlocksFromTag( richNode );
-    default:
-      return [];
+    switch( richNode.type ){
+      case "text":
+        return this.createRdfaBlocksFromText( richNode );
+      case "tag":
+        return this.createRdfaBlocksFromTag( richNode );
+      default:
+        return [];
     }
   }
 
@@ -363,12 +411,14 @@ class RdfaContextScanner {
    */
   createRdfaBlocksFromText( richNode ){
     return [{
+      start: richNode.start,
+      end: richNode.end || richNode.start,
       region: richNode.region(),
-      text: get(richNode, 'text'),
-      context: this.toTriples(get(richNode, 'rdfaContext')),
+      text: richNode.text,
+      context: this.toTriples(richNode.rdfaContext),
       richNode: [richNode],
-      isRdfaBlock: get( richNode, 'isLogicalBlock' ),
-      semanticNode: ( get( richNode, 'isLogicalBlock' ) && richNode )
+      isRdfaBlock: richNode.isLogicalBlock ,
+      semanticNode: ( richNode.isLogicalBlock && richNode )
     }];
   }
 
@@ -398,9 +448,9 @@ class RdfaContextScanner {
   createRdfaBlocksFromTag( richNode ){
     // flatten our children
     const flatRdfaChildren =
-          (get(richNode, 'children') || [])
-          .map( (child) => get( child, 'rdfaBlocks' ) )
-          .reduce( (a,b) => a.concat(b), []);
+      (richNode.children || [])
+        .map( (child) => child.rdfaBlocks || [] )
+        .reduce( (a,b) => a.concat(b), []);
 
     // map & combine children when possible
     const combinedChildren = this.combineRdfaBlocks( flatRdfaChildren );
@@ -410,11 +460,11 @@ class RdfaContextScanner {
 
     // override isRdfaBlock on each child, based on current node
     // set ourselves as the current first richNode in the blocks's rich nodes
-    if( get( richNode, 'isLogicalBlock' ) )
+    if( richNode.isLogicalBlock  )
       combinedChildren.forEach( (child) => {
-        set( child, 'isRdfaBlock', true );
-        if ( ! get( child, 'semanticNode' ) )
-          set( child, 'semanticNode', richNode );
+        this.set( child, 'isRdfaBlock', true );
+        if ( ! child.semanticNode  )
+          this.set( child, 'semanticNode', richNode );
       });
 
     // return new map
@@ -442,25 +492,27 @@ class RdfaContextScanner {
       let firstElement, restElements;
       [ firstElement, ...restElements ] = nodes;
       const combinedElements =
-            restElements.reduce( ([pastElement, ...rest], newElement) => {
-              if( get(pastElement, 'isRdfaBlock') || get(newElement, 'isRdfaBlock') )
-                return [newElement, pastElement, ...rest];
-              else {
-                let [ start, end ] = get( pastElement, 'region' );
-                const combinedRichNodes = [ pastElement, newElement ]
-                      .map( (e) => get( e, 'richNode') )
-                      .reduce( (a,b) => a.concat(b), [] );
+        restElements.reduce( ([pastElement, ...rest], newElement) => {
+          if( pastElement.isRdfaBlock || newElement.isRdfaBlock )
+            return [newElement, pastElement, ...rest];
+          else {
+            // TODO: is this the correct start/end?  It seems we
+            // should take newElement into account too.
+            let [ start, end ] = pastElement.region;
+            const combinedRichNodes = [ pastElement, newElement ]
+              .map( (e) => e.richNode )
+              .reduce( (a,b) => a.concat(b), [] );
 
-                const combinedRdfaNode = {
-                  region: [ start, end ],
-                  text: get(pastElement, 'text').concat( get(newElement, 'text' ) ),
-                  context: get( pastElement, 'context' ),  // pick any of the two
-                  richNode: combinedRichNodes,
-                  isRdfaBlock: false // these two nodes are text nodes
-                };
-                return [combinedRdfaNode, ...rest];
-              }
-            }, [firstElement] );
+            const combinedRdfaNode = {
+              region: [ start, end ],
+              text: pastElement.text.concat( newElement.text  ),
+              context: pastElement.context ,  // pick any of the two
+              richNode: combinedRichNodes,
+              isRdfaBlock: false // these two nodes are text nodes
+            };
+            return [combinedRdfaNode, ...rest];
+          }
+        }, [firstElement] );
       // reverse generated array
       combinedElements.reverse();
       return combinedElements;
@@ -476,7 +528,7 @@ class RdfaContextScanner {
    *
    * @private
    */
-  shallowClone( rdfaBlock ){
+  shallowClone( rdfaBlock ) {
     return Object.assign( {}, rdfaBlock );
   }
 
@@ -497,11 +549,11 @@ class RdfaContextScanner {
    */
   nodeIsLogicalBlock(richNode) {
     // non-tags are never blocks
-    if( get(richNode, 'type') != "tag" ) {
+    if( richNode.type != "tag" ) {
       return false;
     } else {
-      if( ! this.isEmptyRdfaAttributes( get(richNode, 'rdfaAttributes') )
-          || this.isDisplayedAsBlock( richNode ) )
+      if ( ! this.isEmptyRdfaAttributes( richNode.rdfaAttributes )
+           || this.isDisplayedAsBlock( richNode ) )
         return true;
       else
         return false;
@@ -670,16 +722,20 @@ class RdfaContextScanner {
    * @private
    */
   isDisplayedAsBlock(richNode) {
-    if( get( richNode, 'type' ) != 'tag' )
+    if( richNode.type != 'tag' )
       return false;
 
     if( typeof window !== "undefined" ) {
-      const domNode = get(richNode, 'domNode');
+      const domNode = richNode.domNode;
       const displayStyle = window.getComputedStyle(domNode)['display'];
       return displayStyle == 'block' || displayStyle == 'list-item';
     } else {
       return false;
     }
+  }
+
+  set( object, key, value ) {
+    set( object, key, value );
   }
 }
 
