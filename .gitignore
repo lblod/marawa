@@ -1,5 +1,6 @@
 *
 !src/
+!src/*
 !test/
 !test/*
 !.gitignore
