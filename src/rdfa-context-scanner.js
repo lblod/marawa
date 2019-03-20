@@ -548,15 +548,12 @@ class RdfaContextScanner {
    * @private
    */
   nodeIsLogicalBlock(richNode) {
-    // non-tags are never blocks
-    if( richNode.type != "tag" ) {
+    if( ! this.isEmptyRdfaAttributes( richNode.rdfaAttributes ) ) {
+      return true;
+    } else if( richNode.type != "tag" ) {
       return false;
     } else {
-      if ( ! this.isEmptyRdfaAttributes( richNode.rdfaAttributes )
-           || this.isDisplayedAsBlock( richNode ) )
-        return true;
-      else
-        return false;
+      return this.isDisplayedAsBlock( richNode );
     }
   }
 
@@ -602,8 +599,8 @@ class RdfaContextScanner {
    */
   isEmptyRdfaAttributes(rdfaAttributes) {
     return rdfaKeywords
-      .map(function (key) { return rdfaAttributes[key] == null; })
-      .reduce(function(a, b) { return a && b; });
+      .map( (key) => rdfaAttributes[key] == null )
+      .reduce( (a,b) => a && b );
   }
 
   /**

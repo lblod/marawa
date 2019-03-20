@@ -102,4 +102,59 @@ describe( 'Example cases', function() {
       assert.equal( accountServiceHomepageContext.object, "http://zupah.redpencil.io/");
     });
   });
+
+  describe("Can handle empty elements", function(){
+    it( "Allows RDFa in non-self-closing element within a resource", function() {
+      const [block] = analyseElement(`<span prefixes="foaf:http://xmlns.com/foaf/0.1/" resource="#me" typeof="foaf:Person"><span property="foaf:name" content="madnificent"></span></span>`);
+      const rdfaTypeContext = block.context[0];
+      assert.equal( rdfaTypeContext.subject, "#me" );
+      assert.equal( rdfaTypeContext.predicate, "a" );
+      assert.equal( rdfaTypeContext.object, "http://xmlns.com/foaf/0.1/Person" );
+      const rdfaNameContext = block.context[1];
+      assert.equal( rdfaNameContext.subject, "#me" );
+      assert.equal( rdfaNameContext.predicate, "http://xmlns.com/foaf/0.1/name" );
+      assert.equal( rdfaNameContext.object, "madnificent" );
+    });
+
+    it( "Allows RDFa in a self-closing element within a resource", function() {
+      const [block] = analyseElement(`<span prefixes="foaf:http://xmlns.com/foaf/0.1/" resource="#me" typeof="foaf:Person"><meta property="foaf:name" content="madnificent"/>></span>`);
+      const rdfaTypeContext = block.context[0];
+      assert.equal( rdfaTypeContext.subject, "#me" );
+      assert.equal( rdfaTypeContext.predicate, "a" );
+      assert.equal( rdfaTypeContext.object, "http://xmlns.com/foaf/0.1/Person" );
+      const rdfaNameContext = block.context[1];
+      assert.equal( rdfaNameContext.subject, "#me" );
+      assert.equal( rdfaNameContext.predicate, "http://xmlns.com/foaf/0.1/name" );
+      assert.equal( rdfaNameContext.object, "madnificent" );
+    });
+
+    it( "Allows RDFa in non-selfclosing element with resource relationship as last item", function() {
+      const [block] = analyseElement(`<div prefix="besluit: http://data.vlaanderen.be/ns/besluit#" resource="#tweedeBehandeling" typeof="besluit:BehandelingVanAgendapunt"><span property="besluit:gebeurtNa" resource="#eersteBehandeling"></span></div>`);
+      // The type is interpreted
+      const rdfaTypeContext = block.context[0];
+      assert.equal( rdfaTypeContext.subject, "#tweedeBehandeling" );
+      assert.equal( rdfaTypeContext.predicate, "a" );
+      assert.equal( rdfaTypeContext.object, "http://data.vlaanderen.be/ns/besluit#BehandelingVanAgendapunt");
+      // The relationship is discovered
+      const rdfaRelationshipContext = block.context[1];
+      assert.equal( rdfaRelationshipContext.subject, "#tweedeBehandeling" );
+      assert.equal( rdfaRelationshipContext.predicate, "http://data.vlaanderen.be/ns/besluit#gebeurtNa" );
+      assert.equal( rdfaRelationshipContext.object, "#eersteBehandeling" );
+    });
+
+    it( "Allows RDFa in non-selfclosing element with resource relationship as last item inside of other text content", function() {
+      const blocks = analyseElement(`<div prefix="besluit: http://data.vlaanderen.be/ns/besluit#" resource="#tweedeBehandeling" typeof="besluit:BehandelingVanAgendapunt">Hello <span property="besluit:gebeurtNa" resource="#eersteBehandeling"></span> world!</div>`);
+      // The type is interpreted
+      const rdfaTypeContext = blocks[1].context[0];
+      assert.equal( rdfaTypeContext.subject, "#tweedeBehandeling" );
+      assert.equal( rdfaTypeContext.predicate, "a" );
+      assert.equal( rdfaTypeContext.object, "http://data.vlaanderen.be/ns/besluit#BehandelingVanAgendapunt");
+      // The relationship is discovered
+      const rdfaRelationshipContext = blocks[1].context[1];
+      assert.equal( rdfaRelationshipContext.subject, "#tweedeBehandeling" );
+      assert.equal( rdfaRelationshipContext.predicate, "http://data.vlaanderen.be/ns/besluit#gebeurtNa" );
+      assert.equal( rdfaRelationshipContext.object, "#eersteBehandeling" );
+    });
+
+  });
 });
