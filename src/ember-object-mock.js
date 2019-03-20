@@ -7,7 +7,7 @@ function set( object, key, value ){
 }
 
 function warn( string ) {
-  console.log( string );
+  console.warn( string );
 };
 
 
