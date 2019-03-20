@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "module": "src",
   "scripts": {
-    "test": "mocha --compilers js:babel-register",
+    "test": "mocha --require babel-core/register # -w --debug-brk",
     "prepare": "rm -rf dist && babel src --out-dir ./",
     "prepublish": "rm -rf dist && babel src --out-dir ./"
   },
@@ -36,5 +36,10 @@
     "babel-plugin-add-module-exports": "^1.0.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-register": "^6.26.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "jsdom": "^14.0.0",
+    "mocha": "^6.0.2"
   }
 }
