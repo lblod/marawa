@@ -1,5 +1,5 @@
 import RichNode from './rich-node';
-import {get, set} from './ember-object-mock';
+import {set} from './ember-object-mock';
 
 if( ! Node ) {
   var Node = {
@@ -27,7 +27,7 @@ class NodeWalker {
    * Processes a single dom node.
    */
   processDomNode( domNode, parentNode, start = 0 ) {
-    const myStart = (parentNode && get(parentNode, 'end')) || start;
+    const myStart = (parentNode && parentNode.end) || start;
     const richNode = this.createRichNode({
       domNode: domNode,
       parent: parentNode,
@@ -37,15 +37,15 @@ class NodeWalker {
     });
 
     // For tags, recursively analyse the children
-    if (get(richNode, 'type') === 'tag') {
+    if (richNode.type === 'tag') {
       return this.processTagNode( richNode );
     }
     // For text nodes, add the content and update the index
-    else if (get(richNode, 'type') === 'text') {
+    else if (richNode.type === 'text') {
       return this.processTextNode( richNode );
     }
     // For comment nodes, set update the index
-    else { // if (get(richNode, 'type') == 'other')
+    else { // if (richNode.type == 'other')
       return this.processOtherNode( richNode );
     }
   }
@@ -64,7 +64,7 @@ class NodeWalker {
     // what if we have no children?  this is broken
     const [ firstChild, ...nextChildren ] = nextDomChildren;
     const richChildNode = this.stepInDomNode( richNode, firstChild );
-    set( richNode, 'end', get(richChildNode, 'end') );
+    set( richNode, 'end', richChildNode.end );
     if ( nextChildren.length )
       return [ richChildNode, ...this.stepNextDomNode( richNode, nextChildren ) ];
     else
@@ -83,8 +83,8 @@ class NodeWalker {
    * Processes a single rich text node
    */
   processTextNode( richNode ) {
-    const domNode = get(richNode, 'domNode');
-    const start = get(richNode, 'start');
+    const domNode = richNode.domNode;
+    const start = richNode.start;
     let text = domNode.textContent;
     set(richNode, 'text', text);
     set(richNode, 'end', start + text.length);
@@ -94,8 +94,8 @@ class NodeWalker {
    * Processes a single rich tag
    */
   processTagNode( richNode ) {
-    set(richNode, 'end', get(richNode, 'start')); // end will be updated during run
-    const domNode = get(richNode, 'domNode');
+    set(richNode, 'end', richNode.start); // end will be updated during run
+    const domNode = richNode.domNode;
     const childDomNodes = domNode.childNodes;
     set(richNode, 'children',
         this.stepNextDomNode( richNode, childDomNodes ));
@@ -106,7 +106,7 @@ class NodeWalker {
    * Processes a single comment node
    */
   processOtherNode( richNode ) {
-    const start = get(richNode, 'start');
+    const start = richNode.start;
     set(richNode, 'end', start);
     return richNode;
   }
