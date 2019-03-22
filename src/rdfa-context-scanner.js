@@ -413,7 +413,7 @@ class RdfaContextScanner {
     return [{
       start: richNode.start,
       end: richNode.end || richNode.start,
-      region: richNode.region(),
+      region: richNode.region,
       text: richNode.text,
       context: this.toTriples(richNode.rdfaContext),
       richNode: [richNode],

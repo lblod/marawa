@@ -1,5 +1,3 @@
-import { set } from './ember-object-mock';
-
 /**
  * Represents an enriched DOM node.
  *
@@ -14,13 +12,13 @@ class RichNode {
     for( var key in content )
       this[key] = content[key];
   }
-  region() {
+  get region() {
     const start = this.start;
     const end = this.end;
 
     return [ start, end || start ];
   }
-  length() {
+  get length() {
     const end = this.end || 0;
     const start = this.start || 0;
     const diff = Math.max( 0, end - start );
