@@ -1,4 +1,4 @@
-import {get, set} from './ember-object-mock';
+import { set } from './ember-object-mock';
 
 /**
  * Represents an enriched DOM node.
@@ -15,23 +15,23 @@ class RichNode {
       this[key] = content[key];
   }
   region() {
-    const start = get(this, 'start');
-    const end = get(this, 'end');
+    const start = this.start;
+    const end = this.end;
 
     return [ start, end || start ];
   }
   length() {
-    const end = get(this, 'end') || 0;
-    const start = get(this, 'start') || 0;
+    const end = this.end || 0;
+    const start = this.start || 0;
     const diff = Math.max( 0, end - start );
     return diff;
   }
   isInRegion(start, end) {
-    return get(this, 'start') >= start && get(this, 'end') <= end;
+    return this.start >= start && this.end <= end;
   }
   isPartiallyInRegion(start, end) {
-    return ( get(this, 'start') >= start && get(this, 'start') < end )
-      || ( get(this, 'end') > start && get(this, 'end') <= end );
+    return ( this.start >= start && this.start < end )
+      || ( this.end > start && this.end <= end );
   }
 }
 
