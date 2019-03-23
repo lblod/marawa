@@ -745,8 +745,8 @@ class RdfaContextScanner {
  *
  * @return {[RichNode]} RichNodes containing the analysed node
  */
-function analyse(node){
-  return (new RdfaContextScanner()).analyse( node, [ 0, 1000000] );
+function analyse(node, range){
+  return (new RdfaContextScanner()).analyse( node, range );
 }
 
 export default RdfaContextScanner;
