@@ -1,6 +1,8 @@
 import RichNode from './rich-node';
 import {set} from './ember-object-mock';
 
+const VOID_NODES = ["AREA","BASE","BR","COL","COMMAND","EMBED","HR","IMG","INPUT","KEYGEN","LINK","META","PARAM","SOURCE","TRACK","WBR"];
+
 /**
  * dom helper to check whether a node is a "void element"
  * https://www.w3.org/TR/html/syntax.html#void-elements
@@ -12,7 +14,8 @@ import {set} from './ember-object-mock';
  * @public
  */
 const isVoidElement = function isVoidElement(node) {
-  return node.nodeType === Node.ELEMENT_NODE && /^(AREA|BASE|BR|COL|COMMAND|EMBED|HR|IMG|INPUT|KEYGEN|LINK|META|PARAM|SOURCE|TRACK|WBR)$/i.test(node.tagName);
+  return node.nodeType === Node.ELEMENT_NODE
+    && VOID_NODES.includes(node.tagName);
 };
 
 if( ! Node ) {
