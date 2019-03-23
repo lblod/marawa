@@ -1,6 +1,20 @@
 import RichNode from './rich-node';
 import {set} from './ember-object-mock';
 
+/**
+ * dom helper to check whether a node is a "void element"
+ * https://www.w3.org/TR/html/syntax.html#void-elements
+ *
+ * @method isVoidElement
+ * @static
+ * @param {DOMNode} node
+ * @return {boolean}
+ * @public
+ */
+const isVoidElement = function isVoidElement(node) {
+  return node.nodeType === Node.ELEMENT_NODE && /^(AREA|BASE|BR|COL|COMMAND|EMBED|HR|IMG|INPUT|KEYGEN|LINK|META|PARAM|SOURCE|TRACK|WBR)$/i.test(node.tagName);
+};
+
 if( ! Node ) {
   var Node = {
     // Node types consumed from https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
@@ -90,18 +104,55 @@ class NodeWalker {
     set(richNode, 'end', start + text.length);
     return richNode;
   }
+
   /**
    * Processes a single rich tag
    */
   processTagNode( richNode ) {
-    set(richNode, 'end', richNode.start); // end will be updated during run
+    if( !isVoidElement( richNode.domNode ) ) {
+      // Void elements are elements which cannot contain any contents.
+      // They don't have an internal text, but may have other meaning.
+      return this.processRegularTagNode( richNode );
+    } else {
+      // Regular tags are all common tags.  This is the standard case
+      // where we can consider the item's content.
+      return this.processVoidTagNode( richNode );
+    }
+  }
+
+  processRegularTagNode( richNode ) {
+    this.set(richNode, 'end', richNode.start); // end will be updated during run
     const domNode = richNode.domNode;
-    const childDomNodes = domNode.childNodes;
-    set(richNode, 'children',
+    const childDomNodes = domNode.childNodes ? domNode.childNodes : [];
+    this.set(richNode, 'children',
         this.stepNextDomNode( richNode, childDomNodes ));
     this.finishChildSteps( richNode );
     return richNode;
   }
+
+  /**
+   * Processes a void tag node.
+   *
+   * Currently has support for two common types of nodes: IMG and BR.
+   * The BR is replaced by a "\n" symbol.  Other tags are currently
+   * replaced by a space.
+   *
+   * TODO: This code path is experimental.  We know this may cause
+   * various problems and intend to remove it.
+   */
+  processVoidTagNode( richNode ) {
+    const start = richNode.start;
+    let text;
+    if( richNode.domNode.tagName === "BR" ) {
+      text = "\n";
+    } else {
+      text = " ";
+    }
+    this.set(richNode, 'text', text);
+    this.set(richNode, 'end', start + text.length);
+    return richNode;
+  }
+
   /**
    * Processes a single comment node
    */
@@ -134,6 +185,10 @@ class NodeWalker {
    */
   createRichNode( content ) {
     return new RichNode( content );
+  }
+
+  set( object, key, value ) {
+    object[key] = value;
   }
 }
 
