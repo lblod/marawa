@@ -169,13 +169,11 @@ class NodeWalker {
    * Detects the type of a DOM node
    */
   detectDomNodeType( domNode ) {
-    if (domNode.hasChildNodes && domNode.hasChildNodes()) {
+    if (domNode.nodeType === Node.ELEMENT_NODE) {
       return 'tag';
-    }
-    else if (domNode.nodeType != Node.COMMENT_NODE) {
+    } else if( domNode.nodeType === Node.TEXT_NODE ) {
       return 'text';
-    }
-    else {
+    } else {
       return 'other';
     }
   }
