@@ -78,7 +78,9 @@ class NodeWalker {
    * Steps from one (or no) child node to the next.
    */
   stepNextDomNode( richNode , nextDomChildren ) {
-    // what if we have no children?  this is broken
+    if( nextDomChildren.length == 0 )
+      return [];
+
     const [ firstChild, ...nextChildren ] = nextDomChildren;
     const richChildNode = this.stepInDomNode( richNode, firstChild );
     set( richNode, 'end', richChildNode.end );
