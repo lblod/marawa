@@ -18,6 +18,10 @@ class RichNode {
 
     return [ start, end || start ];
   }
+  set region( [start, end] ){
+    this.start = start;
+    this.end = end;
+  }
   get length() {
     const end = this.end || 0;
     const start = this.start || 0;
