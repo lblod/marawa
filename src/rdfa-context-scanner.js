@@ -505,6 +505,8 @@ class RdfaContextScanner {
 
             const combinedRdfaNode = {
               region: [ start, end ],
+              start: start,
+              end: end,
               text: pastElement.text.concat( newElement.text  ),
               context: pastElement.context ,  // pick any of the two
               richNode: combinedRichNodes,
