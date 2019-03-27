@@ -390,7 +390,11 @@ class RdfaContextScanner {
       case "text":
         return this.createRdfaBlocksFromText( richNode );
       case "tag":
-        return this.createRdfaBlocksFromTag( richNode );
+        if( isVoidElement( richNode.domNode ) ) {
+          return this.createRdfaBlocksFromText( richNode );
+        } else {
+          return this.createRdfaBlocksFromTag( richNode );
+        }
       default:
         return [];
     }
