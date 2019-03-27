@@ -334,7 +334,15 @@ class RdfaContextScanner {
    *
    * @private
    */
-  flattenRdfaTree(richNode, [start, end]) {
+  flattenRdfaTree(richNode, [start, end]=[]) {
+    // The desired outcome for a given [start, end] consists of all
+    // lowest level logical blocks which overlap with [start, end].
+    // full contents of all lowest-level logical blocks which
+    // (partially) overlap with [start, end].  As such, we need to
+    // detect and share the current highest-level logical block, and
+    // keep yielding contents until we find a logical block that does
+    // not overlap anymore.
+
     // ran before processing the current node
     const preprocessNode = (richNode) => {
       // does this node represent a logical block of content?
@@ -343,20 +351,28 @@ class RdfaContextScanner {
 
     // ran when processing a single child node
     const processChildNode = (node) => {
-      if (isInRange([node.start, node.end], [start, end])) {
+      // All blocks may contain meaningful content.  If the content is
+      // a logical block then we should check its region for overlap.
+      // If it is not a logical block, it may or may not contain
+      // useful info so we should scan it just to be sure.
+      const shouldScanFurther = isInRange( [node.start, node.end], [start, end] )
+            || ! this.nodeIsLogicalBlock( node );
+      if ( shouldScanFurther ) {
         this.flattenRdfaTree( node, [ start, end ] );
       } else {
         this.set(node, 'isLogicalBlock', false);
         this.set(node, 'isRdfaBlock', false);
         this.set(node, 'rdfaBlockList', []);
       }
-
     };
 
     // ran when we're finished processing all child nodes
     const finishChildSteps = (node) => {
       let rdfaBlockList = [];
-      if (isInRange([node.start, node.end], [start, end])) {
+      if ( ! this.nodeIsLogicalBlock( node )
+           || isInRange([node.start, node.end], [start, end]) ) {
+        // Filter out logical blocks of which the range does not
+        // overlap.
         rdfaBlockList = this.getRdfaBlockList( node );
       } else {
         rdfaBlockList = [];
@@ -510,7 +526,7 @@ class RdfaContextScanner {
               region: [ start, end ],
               start: start,
               end: end,
-              text: pastElement.text.concat( newElement.text  ),
+              text: pastElement.text + newElement.text, // TODO: verify neither is undefined?
               context: pastElement.context ,  // pick any of the two
               richNode: combinedRichNodes,
               isRdfaBlock: false // these two nodes are text nodes
