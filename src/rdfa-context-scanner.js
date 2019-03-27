@@ -493,7 +493,8 @@ class RdfaContextScanner {
       [ firstElement, ...restElements ] = nodes;
       const combinedElements =
         restElements.reduce( ([pastElement, ...rest], newElement) => {
-          if( pastElement.isRdfaBlock || newElement.isRdfaBlock )
+          if( ( pastElement.isRdfaBlock || newElement.isRdfaBlock )
+              || pastElement.end != newElement.start )
             return [newElement, pastElement, ...rest];
           else {
             let [ start, end ] = [ pastElement.start, newElement.end ];
