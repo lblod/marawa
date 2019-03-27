@@ -1,6 +1,6 @@
 import { set, warn } from './ember-object-mock';
 import { rdfaKeywords, prefixableRdfaKeywords, defaultPrefixes } from './support/rdfa-config';
-import { walk } from './node-walker';
+import { walk, isVoidElement } from './node-walker';
 
 // TODO: Research a way to alter the imports when used in an Ember application
 
@@ -496,9 +496,7 @@ class RdfaContextScanner {
           if( pastElement.isRdfaBlock || newElement.isRdfaBlock )
             return [newElement, pastElement, ...rest];
           else {
-            // TODO: is this the correct start/end?  It seems we
-            // should take newElement into account too.
-            let [ start, end ] = pastElement.region;
+            let [ start, end ] = [ pastElement.start, newElement.end ];
             const combinedRichNodes = [ pastElement, newElement ]
               .map( (e) => e.richNode )
               .reduce( (a,b) => a.concat(b), [] );
