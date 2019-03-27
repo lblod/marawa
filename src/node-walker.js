@@ -201,4 +201,4 @@ function walk(node) {
 }
 
 export default NodeWalker;
-export { walk };
+export { walk, isVoidElement };
