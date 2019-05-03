@@ -482,6 +482,10 @@ class RdfaContextScanner {
     // set ourselves as the current first richNode in the blocks's rich nodes
     if( richNode.isLogicalBlock  )
       combinedChildren.forEach( (child) => {
+        // We set the isRdfaBlock on each of our children because if
+        // we are a logical block ourselves our children are not
+        // allowed to combine with their nephews or nieces.
+
         this.set( child, 'isRdfaBlock', true );
         if ( ! child.semanticNode  )
           this.set( child, 'semanticNode', richNode );
@@ -522,7 +526,7 @@ class RdfaContextScanner {
               .map( (e) => e.richNode )
               .reduce( (a,b) => a.concat(b), [] );
 
-            const combinedRdfaNode = {
+            const combinedRdfaBlock = {
               region: [ start, end ],
               start: start,
               end: end,
@@ -531,7 +535,7 @@ class RdfaContextScanner {
               richNode: combinedRichNodes,
               isRdfaBlock: false // these two nodes are text nodes
             };
-            return [combinedRdfaNode, ...rest];
+            return [combinedRdfaBlock, ...rest];
           }
         }, [firstElement] );
       // reverse generated array
