@@ -1,5 +1,5 @@
 import { walk, isVoidElement } from './node-walker';
-import { enrichWithRdfaProperties, resolvePrefixedAttributes, toTriples } from './rdfa-helpers';
+import { enrichWithRdfaProperties, resolvePrefixedAttributes, rdfaAttributesToTriples } from './rdfa-helpers';
 import { set } from './ember-object-mock';
 // TODO: Research a way to alter the imports when used in an Ember application
 
@@ -37,12 +37,24 @@ class RdfaContextScanner {
    * @param {[number,number]} region Region in the text for which RDFa contexts must be calculated.
    *                                 Full region if start or end is undefined.
    *
-   * @return {Array} Array of contexts mapping text parts from the specified region to their RDFa context
-   *               // TODO what is the current interface?
-   *               A context element consists of:
-   *               - region: Region in the text on which the RDFa context applies
-   *               - context: RDFa context (an array of triple objects) of the region
-   *               - text: Plain text of the region
+   * @return {Array} Array of RDFa blocks representing the RDFa context of the given region in a given DOM node.
+   *                 It's important to note that the resulting RDFa blocks might span a broader range than the requested range
+   *                 when the nodes at the border of the range can be combined with non-logical blocks falling outside the range.
+   *
+   *                 An RDFa block has the following properties:
+   *                 - start, end, region: boundaries of the RDFa block
+   *                 - text: plain text of the region
+   *                 - context: array of triples from the top to the node
+   *                 - richNode: array of leaf richNodes that are combined in this RDFa block  // TODO rename to richNodes
+   *                 - isRdfaBlock: whether this block can be combined. RDFa blocks cannot be combined with other blocks if isRdfaBlock == true
+   *                 - semanticNode: closest (ancestor) rich node that is a logical block
+   *
+   *                 The rich nodes (and their trees) in the RDFa blocks are enriched with the following semantic properties:
+   *                 - rdfaPrefixes: map of prefixes at the current node
+   *                 - rdfaAttributes: resolved (= non-prefixed) RDFa attributes set on the node
+   *                 - rdfaContext: array of rdfaAttributes from the top to the current node
+   *                 - isLogicalBlock: whether the individual node represents a logical block of content
+   *                 - rdfaBlocks[]: array of RDFa blocks representing the RDFa context at the current node
    *
    * @public
    */
@@ -67,6 +79,7 @@ class RdfaContextScanner {
       resultingBlocks = rdfaBlocks;
     }
 
+    // TODO is this still required?
     return resultingBlocks.map( (b) => {
       // make sure contexts have a region
       set( b, 'region', [b.start, b.end] );
@@ -87,7 +100,7 @@ class RdfaContextScanner {
   calculateRdfaToTop(startNode) {
     const richNodesOnPath = [];
 
-    for(let richNode = startNode; richNode.parent; richNode = richNode.parent) {
+    for(let richNode = startNode; richNode; richNode = richNode.parent) {
       richNodesOnPath.push(richNode);
     }
 
@@ -121,8 +134,10 @@ class RdfaContextScanner {
   }
 
   /**
-   * Flatten and reduce a rich node RDFa tree to an array of rich leaf nodes.
-   * Only the text nodes falling in a specified region are returned.
+   * Flatten and reduce a rich node RDFa tree to an array of RDFa blocks.
+   * An RDFa block represents a combination of one or more leaf rich nodes
+   * that share the same semantics (in terms of RDFa as well as in terms of display).
+   * Only RDFa blocks (partially) falling in a specified region are returned.
    *
    * It is the goal to yield a flattened tree of RDFa statements.
    * Combining as many of them as possible.  Some examples on how we
@@ -132,9 +147,9 @@ class RdfaContextScanner {
    * which in itself isn't rendered as a block.  The l represents a
    * logical block, these are blocks which render as a visually
    * separate block in html or which contain semantic content.  When
-   * moving upward, we want to combine these nodes in order.  When
-   * combining the nodes, we represent a non-mergeable logical block
-   * by putting parens around it.
+   * moving upward, we want to combine consecutive non-logical blocks.
+   * When combining the blocks, we represent a non-mergeable RDFa block
+   * by putting parens around it. In code that is reflected by the isRdfaBlock property.
    *
    * For the two examples below, we explain the logic under the
    * drawing.
@@ -182,7 +197,7 @@ class RdfaContextScanner {
    * @param {RichNode} richNode Rich node to flatten
    * @param {[number,number]} region Region in the text for which RDFa nodes must be returned
    *
-   * @return {Array} Array of rich leaf text nodes falling in a specified region
+   * @return {Array} Array of RDFa blocks falling in a specified region
    *
    * @private
    */
@@ -204,34 +219,30 @@ class RdfaContextScanner {
       // a logical block then we should check its region for overlap.
       // If it is not a logical block, it may or may not contain
       // useful info so we should scan it just to be sure.
-      const shouldScanFurther = isInRange( [node.start, node.end], [start, end] )
-            || ! this.nodeIsLogicalBlock( node );
+      const shouldScanFurther = isInRange( [node.start, node.end], [start, end] ) || ! this.nodeIsLogicalBlock( node );
       if ( shouldScanFurther ) {
         this.flattenRdfaTree( node, [ start, end ] );
-      } else {
-        set(node, 'isLogicalBlock', false);
-        set(node, 'isRdfaBlock', false);
-        set(node, 'rdfaBlockList', []);
-      }
+      } // else {
+        //   node is a logical block outside the range
+        //   it cannot be combined with a block in the range so it can be ignored
+       // }
     };
 
     // ran when we're finished processing all child nodes
     const finishChildSteps = (node) => {
-      let rdfaBlockList = [];
-      if ( ! this.nodeIsLogicalBlock( node )
-           || isInRange([node.start, node.end], [start, end]) ) {
-        // Filter out logical blocks of which the range does not
-        // overlap.
-        rdfaBlockList = this.getRdfaBlockList( node );
+      let rdfaBlocks;
+      if ( ! this.nodeIsLogicalBlock( node ) || isInRange([node.start, node.end], [start, end]) ) {
+        rdfaBlocks = this.getRdfaBlockList( node );
       } else {
-        rdfaBlockList = [];
+        // node is a logical block outside the range. It doesn't produce an RDFa block for the final result
+        rdfaBlocks = [];
       }
 
-      set( node, 'rdfaBlocks', rdfaBlockList );
+      set( node, 'rdfaBlocks', rdfaBlocks );
     };
 
     preprocessNode(richNode);
-    (richNode.children || []).map( (node) => processChildNode(node) );
+    (richNode.children || []).map( (child) => processChildNode(child) );
     finishChildSteps(richNode);
 
     return richNode.rdfaBlocks;
@@ -256,7 +267,7 @@ class RdfaContextScanner {
         return this.createRdfaBlocksFromText( richNode );
       case "tag":
         if( isVoidElement( richNode.domNode ) ) {
-          return this.createRdfaBlocksFromuText( richNode );
+          return this.createRdfaBlocksFromText( richNode );
         } else {
           return this.createRdfaBlocksFromTag( richNode );
         }
@@ -284,7 +295,7 @@ class RdfaContextScanner {
       end: richNode.end || richNode.start,
       region: richNode.region,
       text: richNode.text,
-      context: toTriples(richNode.rdfaContext),
+      context: rdfaAttributesToTriples(richNode.rdfaContext),
       richNode: [richNode], // TODO richNodes would be a better name
       isRdfaBlock: richNode.isLogicalBlock ,
       semanticNode: ( richNode.isLogicalBlock && richNode )
@@ -292,15 +303,14 @@ class RdfaContextScanner {
   }
 
   /**
-   * Returns an array of rdfaBlock items for the supplied richNode,
+   * Returns an array of RDFa block for the supplied richNode,
    * assuming that is a tag node.
    *
-   * The idea is to first get the rdfaBlocks from each of our children
+   * The idea is to first get the RDFa blocks from each of our children
    * and put them in a flat list.  We only need to check the first and
    * last children for combination, but we're lazy and try to combine
-   * each of them.  In step three we clone this list, so we don't
-   * overwrite what was previously used (handy for debugging).  Then
-   * we possible overwrite the isRdfaBlock property, based on the
+   * each of them if they don't have a different meaning logically.
+   * Next we possibly overwrite the isRdfaBlock property, based on the
    * property of our own richNode.  If we are an rdfaBlock, none of
    * our children is still allowed to be combined after we ran the
    * combinator.
@@ -315,7 +325,6 @@ class RdfaContextScanner {
    * @private
    */
   createRdfaBlocksFromTag( richNode ){
-    // flatten our children
     const flatRdfaChildren =
       (richNode.children || [])
         .map( (child) => child.rdfaBlocks || [] )
@@ -324,11 +333,11 @@ class RdfaContextScanner {
     // map & combine children when possible
     const combinedChildren = this.combineRdfaBlocks( flatRdfaChildren );
 
-    // clone children
+    // clone children. Handy for debugging
     // const clonedChildren = combinedChildren.map( this.shallowClone );
 
     // override isRdfaBlock on each child, based on current node
-    // set ourselves as the current first richNode in the blocks's rich nodes
+    // set ourselves as semantic node on the child if it doesn't have one yet
     if( richNode.isLogicalBlock  )
       combinedChildren.forEach( (child) => {
         set( child, 'isRdfaBlock', true );
@@ -336,51 +345,53 @@ class RdfaContextScanner {
           set( child, 'semanticNode', richNode );
       });
 
-    // return new map
     return combinedChildren;
   }
 
   /**
-   * Combines an array of rdfa blocks based on their properties.
+   * Combines an array of RDFa blocks based on their properties.
+   * RDFa blocks are combined if they don't have a logical different meaning.
    *
    * @method combineRdfaBlocks
    *
-   * @param {[RichNode]} nodes Set of rich nodes for which we'll
-   * combine the rdfaBlocks.
+   * @param {[RdfaBlock]} nodes Set of RDFa blocks we'll try to combine
    *
-   * @return {[RdfaBlock]} Array of rdfaBlocks after the combineable
+   * @return {[RdfaBlock]} Array of RDFa blocks after the combineable
    * ones were combined.
    *
    * @private
    */
-  combineRdfaBlocks( nodes ){
-    if( nodes.length <= 1 ) {
-      return nodes;
+  combineRdfaBlocks( rdfaBlocks ){
+    const combineConsecutiveRdfaBlocks = function(left, right) {
+      const [ start, end ] = [ left.start, right.end ];
+      const combinedRichNodes = [ left, right ]
+            .map( (e) => e.richNode )
+            .reduce( (a,b) => a.concat(b), [] );
+
+      return {
+        region: [ start, end ],
+        start: start,
+        end: end,
+        text: left.text + right.text, // TODO: verify neither is undefined?
+        context: left.context,  // pick any of the two
+        richNode: combinedRichNodes,
+        isRdfaBlock: false // these two nodes can be combined
+      };
+    };
+
+    if( rdfaBlocks.length <= 1 ) {
+      return rdfaBlocks;
     } else {
       // walk front-to back, build result in reverse order
       let firstElement, restElements;
-      [ firstElement, ...restElements ] = nodes;
+      [ firstElement, ...restElements ] = rdfaBlocks;
       const combinedElements =
-        restElements.reduce( ([pastElement, ...rest], newElement) => {
-          if( ( pastElement.isRdfaBlock || newElement.isRdfaBlock )
-              || pastElement.end != newElement.start )
-            return [newElement, pastElement, ...rest];
+        restElements.reduce( ([pastElement, ...rest], nextElement) => {
+          if( ( pastElement.isRdfaBlock || nextElement.isRdfaBlock ) || pastElement.end != nextElement.start )
+            return [nextElement, pastElement, ...rest]; // blocks cannot be combined
           else {
-            let [ start, end ] = [ pastElement.start, newElement.end ];
-            const combinedRichNodes = [ pastElement, newElement ]
-              .map( (e) => e.richNode )
-              .reduce( (a,b) => a.concat(b), [] );
-
-            const combinedRdfaNode = {
-              region: [ start, end ],
-              start: start,
-              end: end,
-              text: pastElement.text + newElement.text, // TODO: verify neither is undefined?
-              context: pastElement.context ,  // pick any of the two
-              richNode: combinedRichNodes,
-              isRdfaBlock: false // these two nodes are text nodes
-            };
-            return [combinedRdfaNode, ...rest];
+            const combinedRdfaBlock = combineConsecutiveRdfaBlocks(pastElement, nextElement);
+            return [combinedRdfaBlock, ...rest];
           }
         }, [firstElement] );
       // reverse generated array

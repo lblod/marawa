@@ -160,7 +160,7 @@ function resolvePrefix(uri, prefixes) {
  * Transforms an array of RDFa attribute objects to an array of triples.
  * A triple is an object consisting of a subject, predicate and object.
  *
- * @method toTriples
+ * @method rdfaAttributesToTriples
  *
  * @param {Array} rdfaAttributes An array of RDFa attribute objects
  *
