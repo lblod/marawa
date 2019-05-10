@@ -30,6 +30,8 @@ const isInRange = function([x, y], [start, end]) {
  * @param {Object} prefixes A map of known prefixes
  *
  * @return {Object} An RDFa attributes object containing resolved URIs
+ *
+ * @private
  */
 function resolvePrefixes(rdfaAttributes, prefixes) {
   const clonedAttributes = Object.assign({}, rdfaAttributes);
@@ -121,7 +123,6 @@ function isRelativeUrl(uri) {
  * @module editor-core
  * @class RdfaContextScanner
  * @constructor
- * @extends EmberObject
  */
 class RdfaContextScanner {
   /**
@@ -134,6 +135,7 @@ class RdfaContextScanner {
    *                                 Full region if start or end is undefined.
    *
    * @return {Array} Array of contexts mapping text parts from the specified region to their RDFa context
+   *               // TODO what is the current interface?
    *               A context element consists of:
    *               - region: Region in the text on which the RDFa context applies
    *               - context: RDFa context (an array of triple objects) of the region
@@ -147,10 +149,8 @@ class RdfaContextScanner {
 
     const richNode = walk(domNode);
 
-    this.enrichRichNodeWithRdfa(richNode);
-
-    const rootRdfa = this.calculateRdfaToTop(richNode);
-    this.expandRdfaContext( richNode, rootRdfa.context, rootRdfa.prefixes );
+    this.calculateRdfaToTop(richNode);
+    this.calculateInnerRdfa(richNode);
 
     const rdfaBlocks = this.flattenRdfaTree(richNode, [start, end]);
 
@@ -172,99 +172,79 @@ class RdfaContextScanner {
   }
 
   /**
-   * Enrich a rich node recursively with its RDFa attributes
-   *
-   * @method enrichRichNodeWithRdfa
-   *
-   * @param {RichNode} richNode Rich node to enrich with its RDFa attributes
-   *
-   * @private
-   */
-  enrichRichNodeWithRdfa(richNode) {
-    const rdfaAttributes = this.getRdfaAttributes(richNode.domNode);
-    this.set( richNode, 'rdfaAttributes', rdfaAttributes);
-
-    if (richNode.children) {
-      richNode.children.forEach((child) => {
-        this.enrichRichNodeWithRdfa(child);
-      });
-    }
-  }
-
-  /**
    * Calculate the RDFa context from a given node to the top of the document
+   * I.e. resolve prefixes and augment RDFa context based on the prefixes and RDFa context of its parent
    *
    * @method calculateRdfaToTop
    *
    * @param {RichNode} richNode Rich node to start from
    *
-   * @return {Object} Object containing the RDFa context and prefixes uptil the given node
-   *
    * @private
    */
-  calculateRdfaToTop(richNode) {
-    const rootContext = [];
-    const resolvedRootContext = [];
-    let rootPrefixes = defaultPrefixes;
+  calculateRdfaToTop(startNode) {
+    const richNodesOnPath = [];
 
-    const startNode = richNode.domNode;
-
-    if (startNode.parentNode) { // start 1 level above the rootNode of the NodeWalker
-      for(let node = startNode.parentNode; node.parentNode; node = node.parentNode) {
-        const rdfaAttributes = this.getRdfaAttributes(node);
-        if (!this.isEmptyRdfaAttributes(rdfaAttributes)) {
-          rootContext.push(rdfaAttributes);
-        }
-      }
-
-      rootContext.reverse(); // get rdfa attributes from top to bottom
-
-      rootContext.forEach((rdfa) => {
-        rootPrefixes = this.mergePrefixes(rootPrefixes, rdfa);
-        const context = resolvePrefixes(rdfa, rootPrefixes);
-        resolvedRootContext.push(context);
-      });
+    for(let richNode = startNode; richNode.parent; richNode = richNode.parent) {
+      richNodesOnPath.push(richNode);
     }
 
-    return {
-      context: resolvedRootContext,
-      prefixes: rootPrefixes
-    };
+    richNodesOnPath.reverse(); // get rich nodes from top to bottom
+
+    richNodesOnPath.forEach((richNode, i) => {
+      if (i == 0)
+        this.enrichWithRdfaProperties(richNode, [], defaultPrefixes);
+      else
+        this.enrichWithRdfaProperties(richNode, richNode[i-1].rdfaContext, richNode[i-1].rdfaPrefixes);
+    });
   }
 
   /**
-   * Recursively expands the RDFa context of a rich node
+   * Recursively expands the RDFa context of the inner nodes of a rich node
    * I.e. resolve prefixes and augment RDFa context based on the prefixes and RDFa context of its parent
    *
-   * @method expandRdfaContext
+   * @method calculateInnerRdfa
+   *
+   * @param {RichNode} richNode Rich node to calculate the inner RDFa for
+   *
+   * @private
+   */
+  calculateInnerRdfa(richNode) {
+    if (richNode.children) {
+      richNode.children.forEach((child) => {
+        this.enrichWithRdfaProperties(child, richNode.rdfaContext, richNode.rdfaPrefixes);
+        this.calculateInnerRdfa(child);
+      });
+    }
+  }
+
+  /**
+   * Enriches a rich node with semantic properties:
+   * - rdfaPrefixes: map of prefixes at the current node
+   * - rdfaAttributes: resolved (non-prefixed) RDFa attributes set on the node
+   * - rdfaContext: array of rdfaAttributes from the top to the current node
+   *
+   * @method enrichWithRdfaProperties
    *
    * @param {RichNode} richNode Rich node to expand the RDFa from
-   * @param {Array} parentContext RDFa context of the node's parent
+   * @param {Array} parentContext RDFa context (array of rdfaAttributes) of the node's parent
    * @param {Object} parentPrefixes RDFa prefixes defined at the node's parent level
    *
    * @private
    */
-  expandRdfaContext(richNode, parentContext, parentPrefixes) {
-    const nodeRdfaAttributes = richNode.rdfaAttributes;
+  enrichWithRdfaProperties(richNode, parentContext, parentPrefixes) {
+    const rdfaAttributes = this.getRdfaAttributes(richNode.domNode);
 
-    const prefixes = this.mergePrefixes(parentPrefixes, nodeRdfaAttributes);
+    const prefixes = this.mergePrefixes(parentPrefixes, richNode.rdfaAttributes);
     this.set(richNode, 'rdfaPrefixes', prefixes);
 
-    if (!this.isEmptyRdfaAttributes(nodeRdfaAttributes)) {
-      const resolvedRdfaAttributes = resolvePrefixes(nodeRdfaAttributes, prefixes);
+    if (!this.isEmptyRdfaAttributes(rdfaAttributes)) {
+      const resolvedRdfaAttributes = resolvePrefixes(rdfaAttributes, prefixes);
+      this.set(richNode, 'rdfaAttributes', resolvedRdfaAttributes);
       this.set(richNode, 'rdfaContext', parentContext.concat(resolvedRdfaAttributes));
     }
     else {
+      this.set(richNode, 'rdfaAttributes', null);
       this.set(richNode, 'rdfaContext', parentContext);
-    }
-
-    if (richNode.children) {
-      richNode.children.forEach((child) => {
-        const context = richNode.rdfaContext;
-        const prefixes = richNode.rdfaPrefixes;
-
-        this.expandRdfaContext(child, context, prefixes);
-      });
     }
   }
 
@@ -580,6 +560,8 @@ class RdfaContextScanner {
 
   /**
    * Get the RDFa attributes of a DOM node
+   * Supported RDFa attributes are configured in ./support/rdfa-config
+   * Additionally the text content of the node is set as 'text' attribute
    *
    * @method getRdfaAttributes
    *
