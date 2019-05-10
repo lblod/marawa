@@ -1,7 +1,6 @@
-import { set, warn } from './ember-object-mock';
-import { rdfaKeywords, prefixableRdfaKeywords, defaultPrefixes } from './support/rdfa-config';
 import { walk, isVoidElement } from './node-walker';
-
+import { enrichWithRdfaProperties, resolvePrefixedAttributes, toTriples } from './rdfa-helpers';
+import { set } from './ember-object-mock';
 // TODO: Research a way to alter the imports when used in an Ember application
 
 /**
@@ -19,102 +18,6 @@ const isInRange = function([x, y], [start, end]) {
       || (y >= start && y <= end)
       || (x <= start && end <= y);
 };
-
-/**
- * Resolves the URIs in an RDFa attributes object with the correct prefix
- * based on a set of known prefixes.
- *
- * @method resolvePrefix
- *
- * @param {Object} rdfaAttributes An object of RDFa attributes
- * @param {Object} prefixes A map of known prefixes
- *
- * @return {Object} An RDFa attributes object containing resolved URIs
- *
- * @private
- */
-function resolvePrefixes(rdfaAttributes, prefixes) {
-  const clonedAttributes = Object.assign({}, rdfaAttributes);
-  prefixableRdfaKeywords.forEach( (key) => {
-    if (clonedAttributes[key] != null)
-      clonedAttributes[key] = resolvePrefix(clonedAttributes[key], prefixes);
-  });
-  return clonedAttributes;
-}
-
-/**
- * Resolves a given (array of) URI(s) with the correct prefix (if it's prefixed)
- * based on a set of known prefixes.
- *
- * @method resolvePrefix
- *
- * @param {string|Array} uri An (array of) URI(s) to resolve
- * @param {Object} prefixes A map of known prefixes
- *
- * @return {string} The resolved URI
- *
- * @private
- */
-function resolvePrefix(uri, prefixes) {
-  const resolve = (uri) => {
-    if (isFullUri(uri) || isRelativeUrl(uri)) {
-      return uri;
-    } else {
-      const i = uri.indexOf(':');
-
-      if (i < 0) { // no prefix defined. Use default.
-        if (prefixes[''] == null)
-          warn(`No default RDFa prefix defined`, { id: 'rdfa.missingPrefix' });
-        uri = prefixes[''] + uri;
-      } else {
-        const key = uri.substr(0, i);
-        if (prefixes[key] == null)
-          warn(`No RDFa prefix '${key}' defined`, { id: 'rdfa.missingPrefix' });
-        uri = prefixes[key] + uri.substr(i + 1);
-      }
-
-      return uri;
-    }
-  };
-
-  if (Array.isArray(uri)) {
-    return uri.map( u => resolve(u));
-  } else {
-    return resolve(uri);
-  }
-}
-
-/**
- * Returns whether a given URI is a full URI.
- *
- * @method isFullUri
- *
- * @param {string} uri A URI
- *
- * @return {boolean} Whether the given URI is a full URI.
- *
- * @private
- */
-function isFullUri(uri) {
-  return uri.includes('://');
-}
-
-/**
- * Returns whether a given URI is a relative URI.
- *
- * @method isRelativeUrl
- *
- * @param {string} uri A URI
- *
- * @return {boolean} Whether the given URI is a relative URI.
- *
- * @private
- */
-function isRelativeUrl(uri) {
-  return uri.startsWith('#') || uri.startsWith('/') || uri.startsWith('./') || uri.startsWith('../');
-}
-
-
 
 
 /**
@@ -166,7 +69,7 @@ class RdfaContextScanner {
 
     return resultingBlocks.map( (b) => {
       // make sure contexts have a region
-      this.set( b, 'region', [b.start, b.end] );
+      set( b, 'region', [b.start, b.end] );
       return b;
     } );
   }
@@ -191,10 +94,12 @@ class RdfaContextScanner {
     richNodesOnPath.reverse(); // get rich nodes from top to bottom
 
     richNodesOnPath.forEach((richNode, i) => {
-      if (i == 0)
-        this.enrichWithRdfaProperties(richNode, [], defaultPrefixes);
-      else
-        this.enrichWithRdfaProperties(richNode, richNode[i-1].rdfaContext, richNode[i-1].rdfaPrefixes);
+      if (i == 0) {
+        enrichWithRdfaProperties(richNode);
+      } else {
+        const parent = richNode[i-1];
+        enrichWithRdfaProperties(richNode, parent.rdfaContext, parent.rdfaPrefixes);
+      }
     });
   }
 
@@ -204,48 +109,15 @@ class RdfaContextScanner {
    *
    * @method calculateInnerRdfa
    *
-   * @param {RichNode} richNode Rich node to calculate the inner RDFa for
+   * @param {RichNode} richNode Rich node to start from
    *
    * @private
    */
   calculateInnerRdfa(richNode) {
-    if (richNode.children) {
-      richNode.children.forEach((child) => {
-        this.enrichWithRdfaProperties(child, richNode.rdfaContext, richNode.rdfaPrefixes);
-        this.calculateInnerRdfa(child);
-      });
-    }
-  }
-
-  /**
-   * Enriches a rich node with semantic properties:
-   * - rdfaPrefixes: map of prefixes at the current node
-   * - rdfaAttributes: resolved (non-prefixed) RDFa attributes set on the node
-   * - rdfaContext: array of rdfaAttributes from the top to the current node
-   *
-   * @method enrichWithRdfaProperties
-   *
-   * @param {RichNode} richNode Rich node to expand the RDFa from
-   * @param {Array} parentContext RDFa context (array of rdfaAttributes) of the node's parent
-   * @param {Object} parentPrefixes RDFa prefixes defined at the node's parent level
-   *
-   * @private
-   */
-  enrichWithRdfaProperties(richNode, parentContext, parentPrefixes) {
-    const rdfaAttributes = this.getRdfaAttributes(richNode.domNode);
-
-    const prefixes = this.mergePrefixes(parentPrefixes, richNode.rdfaAttributes);
-    this.set(richNode, 'rdfaPrefixes', prefixes);
-
-    if (!this.isEmptyRdfaAttributes(rdfaAttributes)) {
-      const resolvedRdfaAttributes = resolvePrefixes(rdfaAttributes, prefixes);
-      this.set(richNode, 'rdfaAttributes', resolvedRdfaAttributes);
-      this.set(richNode, 'rdfaContext', parentContext.concat(resolvedRdfaAttributes));
-    }
-    else {
-      this.set(richNode, 'rdfaAttributes', null);
-      this.set(richNode, 'rdfaContext', parentContext);
-    }
+    (richNode.children || []).forEach((child) => {
+      enrichWithRdfaProperties(child, richNode.rdfaContext, richNode.rdfaPrefixes);
+      this.calculateInnerRdfa(child);
+    });
   }
 
   /**
@@ -323,13 +195,10 @@ class RdfaContextScanner {
     // keep yielding contents until we find a logical block that does
     // not overlap anymore.
 
-    // ran before processing the current node
     const preprocessNode = (richNode) => {
-      // does this node represent a logical block of content?
-      this.set(richNode, 'isLogicalBlock', this.nodeIsLogicalBlock( richNode ));
+      set(richNode, 'isLogicalBlock', this.nodeIsLogicalBlock( richNode ));
     };
 
-    // ran when processing a single child node
     const processChildNode = (node) => {
       // All blocks may contain meaningful content.  If the content is
       // a logical block then we should check its region for overlap.
@@ -340,9 +209,9 @@ class RdfaContextScanner {
       if ( shouldScanFurther ) {
         this.flattenRdfaTree( node, [ start, end ] );
       } else {
-        this.set(node, 'isLogicalBlock', false);
-        this.set(node, 'isRdfaBlock', false);
-        this.set(node, 'rdfaBlockList', []);
+        set(node, 'isLogicalBlock', false);
+        set(node, 'isRdfaBlock', false);
+        set(node, 'rdfaBlockList', []);
       }
     };
 
@@ -358,12 +227,12 @@ class RdfaContextScanner {
         rdfaBlockList = [];
       }
 
-      this.set( node, 'rdfaBlocks', rdfaBlockList );
+      set( node, 'rdfaBlocks', rdfaBlockList );
     };
 
     preprocessNode(richNode);
     (richNode.children || []).map( (node) => processChildNode(node) );
-    finishChildSteps( richNode );
+    finishChildSteps(richNode);
 
     return richNode.rdfaBlocks;
   }
@@ -387,7 +256,7 @@ class RdfaContextScanner {
         return this.createRdfaBlocksFromText( richNode );
       case "tag":
         if( isVoidElement( richNode.domNode ) ) {
-          return this.createRdfaBlocksFromText( richNode );
+          return this.createRdfaBlocksFromuText( richNode );
         } else {
           return this.createRdfaBlocksFromTag( richNode );
         }
@@ -415,8 +284,8 @@ class RdfaContextScanner {
       end: richNode.end || richNode.start,
       region: richNode.region,
       text: richNode.text,
-      context: this.toTriples(richNode.rdfaContext),
-      richNode: [richNode],
+      context: toTriples(richNode.rdfaContext),
+      richNode: [richNode], // TODO richNodes would be a better name
       isRdfaBlock: richNode.isLogicalBlock ,
       semanticNode: ( richNode.isLogicalBlock && richNode )
     }];
@@ -462,9 +331,9 @@ class RdfaContextScanner {
     // set ourselves as the current first richNode in the blocks's rich nodes
     if( richNode.isLogicalBlock  )
       combinedChildren.forEach( (child) => {
-        this.set( child, 'isRdfaBlock', true );
+        set( child, 'isRdfaBlock', true );
         if ( ! child.semanticNode  )
-          this.set( child, 'semanticNode', richNode );
+          set( child, 'semanticNode', richNode );
       });
 
     // return new map
@@ -549,165 +418,13 @@ class RdfaContextScanner {
    * @private
    */
   nodeIsLogicalBlock(richNode) {
-    if( ! this.isEmptyRdfaAttributes( richNode.rdfaAttributes ) ) {
+    if( richNode.rdfaAttributes ) {
       return true;
     } else if( richNode.type != "tag" ) {
       return false;
     } else {
       return this.isDisplayedAsBlock( richNode );
     }
-  }
-
-  /**
-   * Get the RDFa attributes of a DOM node
-   * Supported RDFa attributes are configured in ./support/rdfa-config
-   * Additionally the text content of the node is set as 'text' attribute
-   *
-   * @method getRdfaAttributes
-   *
-   * @param {Node} domNode DOM node to get the RDFa attributes from
-   *
-   * @return {Object} Map of RDFa attributes key-value pairs
-   *
-   * @private
-   */
-  getRdfaAttributes(domNode) {
-    const rdfaAttributes = {};
-
-    if (domNode && domNode.getAttribute)
-    {
-      rdfaKeywords.forEach(function(key) {
-        rdfaAttributes[key] = domNode.getAttribute(key);
-      });
-
-      if (rdfaAttributes['typeof'] != null)
-        rdfaAttributes['typeof'] = rdfaAttributes['typeof'].split(' ');
-    }
-
-    rdfaAttributes['text'] = domNode.textContent;
-
-    return rdfaAttributes;
-  }
-
-  /**
-   * Returns whether a given RDFa attributes object is empty. This means no RDFa statement is set.
-   *
-   * @method isEmptyRdfaAttributes
-   *
-   * @param {Object} rdfaAttributes An RDFa attributes object
-   *
-   * @return {boolean} Whether the given RDFa attributes object is empty.
-   *
-   * @private
-   */
-  isEmptyRdfaAttributes(rdfaAttributes) {
-    return rdfaKeywords
-      .map( (key) => rdfaAttributes[key] == null )
-      .reduce( (a,b) => a && b );
-  }
-
-  /**
-   * Create a map of RDFa prefixes by merging an existing map of RDFa prefixes with new RDFa attributes
-   *
-   * @method mergePrefixes
-   *
-   * @param {Object} prefixes An map of RDFa prefixes
-   * @param {Object} rdfAttributes An RDFa attributes object
-   *
-   * @return {Object} An new map of RDFa prefixes
-   *
-   * @private
-   */
-  mergePrefixes(prefixes, rdfaAttributes) {
-    const mergedPrefixes = Object.assign({}, prefixes);
-
-    if (rdfaAttributes['vocab'] != null) {
-      mergedPrefixes[''] = rdfaAttributes['vocab'];
-    }
-    if (rdfaAttributes['prefix'] != null) {
-      const parts = rdfaAttributes['prefix'].split(" ");
-      for(let i = 0; i < parts.length; i = i + 2) {
-        const key = parts[i].substr(0, parts[i].length - 1);
-        mergedPrefixes[key] = parts[i + 1];
-      }
-    }
-
-    return mergedPrefixes;
-  }
-
-  /**
-   * Transforms an array of RDFa attribute objects to an array of triples.
-   * A triple is an object consisting of a subject, predicate and object.
-   *
-   * @method toTriples
-   *
-   * @param {Array} contexts An array of RDFa attribute objects
-   *
-   * @returns {Array} An array of triple objects
-   *
-   * @private
-   */
-  toTriples(rdfaAttributes) {
-    const triples = [];
-
-    let currentScope = null;
-
-    rdfaAttributes.forEach(function(rdfa) {
-      let nextScope = null;
-
-      const triple = {};
-
-      if (rdfa['about'] != null)
-        currentScope = rdfa['about'];
-
-      if (rdfa['content'] != null)
-        triple.object = rdfa['content'];
-      if (rdfa['datatype'] != null)
-        triple.datatype = rdfa['datatype'];
-
-      if (rdfa['property'] != null) {
-        triple.predicate = rdfa['property'];
-
-        if (rdfa['href'] != null)
-          triple.object = rdfa['href'];
-
-        if (rdfa['resource'] != null) {
-          triple.object = rdfa['resource'];
-          nextScope = rdfa['resource'];
-        }
-
-        if (triple.object == null)
-          triple.object = rdfa.text;
-      } else {
-        if (rdfa['resource'] != null)
-          currentScope = rdfa['resource'];
-      }
-
-      triple.subject = currentScope;
-      if (triple.predicate != null) {
-        triples.push(triple);
-      }
-
-      if (rdfa['typeof'] != null) {
-        rdfa['typeof'].forEach(function(type) {
-          triples.push({
-            subject: rdfa['resource'], // create a blank node if resource == null
-            predicate: 'a',
-            object: type
-          });
-        });
-      }
-
-      // TODO: add support for 'rel' keyword: https://www.w3.org/TR/rdfa-primer/#alternative-for-setting-the-property-rel
-      // TODO: add support for 'src' keyword
-
-      // nextScope becomes the subject at the next level
-      if (nextScope != null) {
-        currentScope = nextScope;
-      }
-    });
-
-    return triples;
   }
 
   /**
@@ -733,10 +450,6 @@ class RdfaContextScanner {
       return false;
     }
   }
-
-  set( object, key, value ) {
-    set( object, key, value );
-  }
 }
 
 /**
@@ -750,6 +463,14 @@ class RdfaContextScanner {
  */
 function analyse(node, range){
   return (new RdfaContextScanner()).analyse( node, range );
+}
+
+/**
+ * @deprecated
+*/
+function resolvePrefixes() {
+  console.warn(`[DEPRECATED] Method 'resolvePrefixes' from rdfa-context-scanner is deprecated. Use 'resolvePrefixedAttributes' from rdfa-helpers instead.`);
+  resolvePrefixedAttributes(...arguments);
 }
 
 export default RdfaContextScanner;
