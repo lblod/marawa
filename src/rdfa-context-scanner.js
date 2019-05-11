@@ -306,7 +306,11 @@ class RdfaContextScanner {
    * Returns an array of RDFa block for the supplied richNode,
    * assuming that is a tag node.
    *
-   * The idea is to first get the RDFa blocks from each of our children
+   * If the tag node doesn't have children, i.e. it's an empty tag
+   * without text, a new RDFa block is created for the empty rich node.
+   *
+   * If the tag node has children, the idea is to first get
+   * the RDFa blocks from each of our children
    * and put them in a flat list.  We only need to check the first and
    * last children for combination, but we're lazy and try to combine
    * each of them if they don't have a different meaning logically.
@@ -325,27 +329,39 @@ class RdfaContextScanner {
    * @private
    */
   createRdfaBlocksFromTag( richNode ){
-    const flatRdfaChildren =
-      (richNode.children || [])
-        .map( (child) => child.rdfaBlocks || [] )
-        .reduce( (a,b) => a.concat(b), []);
+    if ( !richNode.children || richNode.children.length == 0 ) { // an empty tag without text
+      return [{
+        start: richNode.start,
+        end: richNode.end || richNode.start,
+        region: richNode.region,
+        text: richNode.text,
+        context: rdfaAttributesToTriples(richNode.rdfaContext),
+        richNode: [richNode], // TODO richNodes would be a better name
+        isRdfaBlock: richNode.isLogicalBlock ,
+        semanticNode: ( richNode.isLogicalBlock && richNode )
+      }];
+    } else {
+      const flatRdfaChildren = richNode.children
+                                       .map( (child) => child.rdfaBlocks || [] )
+                                       .reduce( (a,b) => a.concat(b), []);
 
-    // map & combine children when possible
-    const combinedChildren = this.combineRdfaBlocks( flatRdfaChildren );
+      // map & combine children when possible
+      const combinedChildren = this.combineRdfaBlocks( flatRdfaChildren );
 
-    // clone children. Handy for debugging
-    // const clonedChildren = combinedChildren.map( this.shallowClone );
+      // clone children. Handy for debugging
+      // const clonedChildren = combinedChildren.map( this.shallowClone );
 
-    // override isRdfaBlock on each child, based on current node
-    // set ourselves as semantic node on the child if it doesn't have one yet
-    if( richNode.isLogicalBlock  )
-      combinedChildren.forEach( (child) => {
-        set( child, 'isRdfaBlock', true );
-        if ( ! child.semanticNode  )
-          set( child, 'semanticNode', richNode );
-      });
+      // override isRdfaBlock on each child, based on current node
+      // set ourselves as semantic node on the child if it doesn't have one yet
+      if( richNode.isLogicalBlock  )
+        combinedChildren.forEach( (child) => {
+          set( child, 'isRdfaBlock', true );
+          if ( ! child.semanticNode  )
+            set( child, 'semanticNode', richNode );
+        });
 
-    return combinedChildren;
+      return combinedChildren;
+    }
   }
 
   /**
