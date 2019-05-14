@@ -35,6 +35,14 @@ class RichNode {
     return ( this.start >= start && this.start < end )
       || ( this.end > start && this.end <= end );
   }
+  isPartiallyOrFullyInRegion([start, end]) {
+    if (start == undefined || end == undefined)
+      return true;
+
+    return (this.start >= start && this.start <= end)
+      || (this.end >= start && this.end <= end)
+      || (this.start <= start && end <= this.end);
+  }
 }
 
-export default  RichNode;
+export default RichNode;

@@ -117,7 +117,7 @@ describe( 'Example cases', function() {
     });
 
     it( "Allows RDFa in a self-closing element within a resource", function() {
-      const [block] = analyseElement(`<span prefixes="foaf:http://xmlns.com/foaf/0.1/" resource="#me" typeof="foaf:Person"><meta property="foaf:name" content="madnificent"/>></span>`);
+      const [block] = analyseElement(`<span prefixes="foaf:http://xmlns.com/foaf/0.1/" resource="#me" typeof="foaf:Person"><meta property="foaf:name" content="madnificent"/></span>`);
       const rdfaTypeContext = block.context[0];
       assert.equal( rdfaTypeContext.subject, "#me" );
       assert.equal( rdfaTypeContext.predicate, "a" );

@@ -28,7 +28,7 @@ if( ! Node ) {
     COMMENT_NODE: 8, // 	A Comment node, such as <!-- … -->.
     DOCUMENT_NODE: 9, // 	A Document node.
     DOCUMENT_TYPE_NODE: 10, // 	A DocumentType node, such as <!DOCTYPE html>.
-    DOCUMENT_FRAGMENT_NODE: 11, // 	A DocumentFragment node.
+    DOCUMENT_FRAGMENT_NODE: 11 // 	A DocumentFragment node.
   };
 }
 

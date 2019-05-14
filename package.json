@@ -4,7 +4,7 @@
   "module": "src",
   "scripts": {
     "test": "mocha --require babel-core/register",
-    "debug-test": "mocha --require babel-core/register -w --debug-brk",
+    "debug-test": "mocha --require babel-core/register -w --inspect=0.0.0.0:9229",
     "prepare": "rm -rf dist && babel src --out-dir ./",
     "prepublish": "rm -rf dist && babel src --out-dir ./"
   },

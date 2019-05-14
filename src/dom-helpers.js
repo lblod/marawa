@@ -2,9 +2,7 @@
  * Helpers for maintaining a DOM tree.
  */
 
-import { analyse as analyseContexts,
-         resolvePrefixes
-       } from './rdfa-context-scanner';
+import { analyse as analyseContexts } from './rdfa-context-scanner';
 
 /**
  * Finds the first dom node with the supplied type
@@ -47,11 +45,8 @@ function findAllNodesOfType( node, type ) {
   let matchingNodes = [];
 
   const processItem = function( richNode ){
-    if( richNode.rdfaAttributes.typeof ) {
-      const nodeTypes = resolvePrefixes( richNode.rdfaAttributes, richNode.rdfaPrefixes ).typeof;
-      if( nodeTypes.includes( type ) )
-        matchingNodes.push( richNode );
-    }
+    if( richNode.rdfaAttributes.typeof.includes( type ) )
+      matchingNodes.push( richNode );
   };
 
   const walk = function( richNode, functor ){
