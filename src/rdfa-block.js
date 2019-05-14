@@ -6,7 +6,7 @@
  * - start, end, region: boundaries of the RDFa block
  * - text: plain text of the region
  * - richNodes: array of leaf richNodes that are combined in this RDFa block
- * - semanticNode: closest (ancestor) rich node that is a logical block
+ * - semanticNode: deepest (ancestor) rich node that contains the context of this block
  * - context: array of triples from the top to the semantic node
  * - isRdfaBlock: whether this block can be combined with other blocks (mainly for internal usage).
  *                RDFa blocks cannot be combined if isRdfaBlock == true

@@ -43,6 +43,21 @@ class RichNode {
       || (this.end >= start && this.end <= end)
       || (this.start <= start && end <= this.end);
   }
+  isAncestorOf(richNode) {
+    let node = richNode;
+
+    while (node) {
+      if ( this.domNode == node.domNode )
+        return true;
+
+      node = richNode.parent;
+    }
+
+    return false;
+  }
+  isDescendentOf(richNode) {
+    return richNode.isAncestorOf(this);
+  }
 }
 
 export default RichNode;
