@@ -1,5 +1,4 @@
 import RichNode from './rich-node';
-import {set} from './ember-object-mock';
 
 const VOID_NODES = ["AREA","BASE","BR","COL","COMMAND","EMBED","HR","IMG","INPUT","KEYGEN","LINK","META","PARAM","SOURCE","TRACK","WBR"];
 
@@ -83,7 +82,7 @@ class NodeWalker {
 
     const [ firstChild, ...nextChildren ] = nextDomChildren;
     const richChildNode = this.stepInDomNode( richNode, firstChild );
-    set( richNode, 'end', richChildNode.end );
+    richNode.end = richChildNode.end;
     if ( nextChildren.length )
       return [ richChildNode, ...this.stepNextDomNode( richNode, nextChildren ) ];
     else
@@ -105,8 +104,8 @@ class NodeWalker {
     const domNode = richNode.domNode;
     const start = richNode.start;
     let text = domNode.textContent;
-    set(richNode, 'text', text);
-    set(richNode, 'end', start + text.length);
+    richNode.text = text;
+    richNode.end = start + text.length;
     return richNode;
   }
 
@@ -126,11 +125,10 @@ class NodeWalker {
   }
 
   processRegularTagNode( richNode ) {
-    this.set(richNode, 'end', richNode.start); // end will be updated during run
+    richNode.end = richNode.start; // end will be updated during run
     const domNode = richNode.domNode;
     const childDomNodes = domNode.childNodes ? domNode.childNodes : [];
-    this.set(richNode, 'children',
-        this.stepNextDomNode( richNode, childDomNodes ));
+    richNode.children = this.stepNextDomNode( richNode, childDomNodes );
     this.finishChildSteps( richNode );
     return richNode;
   }
@@ -153,8 +151,8 @@ class NodeWalker {
     } else {
       text = " ";
     }
-    this.set(richNode, 'text', text);
-    this.set(richNode, 'end', start + text.length);
+    richNode.text = text;
+    richNode.end = start + text.length;
     return richNode;
   }
 
@@ -163,7 +161,7 @@ class NodeWalker {
    */
   processOtherNode( richNode ) {
     const start = richNode.start;
-    set(richNode, 'end', start);
+    richNode.end = start;
     return richNode;
   }
 
@@ -188,10 +186,6 @@ class NodeWalker {
    */
   createRichNode( content ) {
     return new RichNode( content );
-  }
-
-  set( object, key, value ) {
-    object[key] = value;
   }
 }
 
