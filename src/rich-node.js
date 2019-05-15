@@ -50,7 +50,7 @@ class RichNode {
       if ( this.domNode == node.domNode )
         return true;
 
-      node = richNode.parent;
+      node = node.parent;
     }
 
     return false;
