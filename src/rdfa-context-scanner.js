@@ -1,6 +1,7 @@
 import { walk, isVoidElement } from './node-walker';
 import { enrichWithRdfaProperties, resolvePrefixedAttributes, rdfaAttributesToTriples } from './rdfa-helpers';
 import RdfaBlock from './rdfa-block';
+import RichNode from './rich-node';
 // TODO: Research a way to alter the imports when used in an Ember application
 
 /**
@@ -75,9 +76,12 @@ class RdfaContextScanner {
    * @private
    */
   calculateRdfaToTop(startNode) {
-    const richNodesOnPath = [];
+    const richNodesOnPath = [startNode];
 
-    for(let richNode = startNode; richNode; richNode = richNode.parent) {
+    for(let domNode = startNode.domNode.parentNode; domNode; domNode = domNode.parentNode) {
+      // nodeWalker only creates RichNodes for the inner tree of startNode
+      // let's create richNodes for the path from startNode uptil the top of the document
+      const richNode = new RichNode( { domNode: domNode } );
       richNodesOnPath.push(richNode);
     }
 
@@ -87,7 +91,8 @@ class RdfaContextScanner {
       if (i == 0) {
         enrichWithRdfaProperties(richNode);
       } else {
-        const parent = richNode[i-1];
+        const parent = richNodesOnPath[i-1];
+        richNode.parent = parent;
         enrichWithRdfaProperties(richNode, parent.rdfaContext, parent.rdfaPrefixes);
       }
     });
