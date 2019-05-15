@@ -1,6 +1,5 @@
 import { walk, isVoidElement } from './node-walker';
 import { enrichWithRdfaProperties, resolvePrefixedAttributes, rdfaAttributesToTriples } from './rdfa-helpers';
-import { set } from './ember-object-mock';
 import RdfaBlock from './rdfa-block';
 // TODO: Research a way to alter the imports when used in an Ember application
 
@@ -60,7 +59,7 @@ class RdfaContextScanner {
     // TODO is this still required?
     return resultingBlocks.map( (b) => {
       // make sure contexts have a region
-      set( b, 'region', [b.start, b.end] );
+      b.region = [b.start, b.end];
       return b;
     } );
   }
@@ -189,7 +188,7 @@ class RdfaContextScanner {
     // not overlap anymore.
 
     const preprocessNode = (richNode) => {
-      set(richNode, 'isLogicalBlock', this.nodeIsLogicalBlock( richNode ));
+      richNode.isLogicalBlock = this.nodeIsLogicalBlock( richNode );
     };
 
     const processChildNode = (node) => {
@@ -217,7 +216,7 @@ class RdfaContextScanner {
         rdfaBlocks = [];
       }
 
-      set( node, 'rdfaBlocks', rdfaBlocks );
+      node.rdfaBlocks = rdfaBlocks;
     };
 
     preprocessNode(richNode);
@@ -334,9 +333,9 @@ class RdfaContextScanner {
       // set ourselves as semantic node on the child if it doesn't have one yet
       if( richNode.isLogicalBlock  )
         combinedChildren.forEach( (child) => {
-          set( child, 'isRdfaBlock', true );
+          child.isRdfaBlock = true;
           if ( ! child.semanticNode  )
-            set( child, 'semanticNode', richNode );
+            child.semanticNode = richNode;
         });
 
       return combinedChildren;

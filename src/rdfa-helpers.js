@@ -3,7 +3,6 @@
  */
 
 import { rdfaKeywords, prefixableRdfaKeywords, defaultPrefixes } from './support/rdfa-config';
-import { set } from './ember-object-mock';
 
 /**
  * Enriches a rich node with semantic properties:
@@ -23,13 +22,13 @@ function enrichWithRdfaProperties(richNode, parentContext = [], parentPrefixes =
   if (rdfaAttributes) {
     const prefixes = mergePrefixes(parentPrefixes, rdfaAttributes);
     const resolvedRdfaAttributes = resolvePrefixedAttributes(rdfaAttributes, prefixes);
-    set(richNode, 'rdfaPrefixes', prefixes);
-    set(richNode, 'rdfaAttributes', resolvedRdfaAttributes);
-    set(richNode, 'rdfaContext', parentContext.concat(resolvedRdfaAttributes));
+    richNode.rdfaPrefixes = prefixes;
+    richNode.rdfaAttributes = resolvedRdfaAttributes;
+    richNode.rdfaContext = parentContext.concat(resolvedRdfaAttributes);
   } else {
-    set(richNode, 'rdfaPrefixes', parentPrefixes);      
-    set(richNode, 'rdfaAttributes', null);
-    set(richNode, 'rdfaContext', parentContext);
+    richNode.rdfaPrefixes = parentPrefixes;
+    richNode.rdfaAttributes = null;
+    richNode.rdfaContext = parentContext;
   }
 }
 
