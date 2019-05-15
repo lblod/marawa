@@ -40,9 +40,13 @@ class RdfaBlock {
     console.warn(`[DEPRECATED] Property 'richNode' of RdfaBlock is deprecated. Please use 'richNodes' instead.`);
     return this.richNodes;
   }
-  /**
-   * Returns whether the RDFa block (partially) falls in region [start, end]
-  */
+  isInRegion([start, end]) {
+    return start <= this.start && this.end <= end;
+  }
+  isPartiallyInRegion([start, end]) {
+    return ( this.start >= start && this.start < end )
+      || ( this.end > start && this.end <= end );
+  }
   isPartiallyOrFullyInRegion([start, end]) {
     if (start == undefined || end == undefined)
       return true;
@@ -50,6 +54,9 @@ class RdfaBlock {
     return (this.start >= start && this.start <= end)
       || (this.end >= start && this.end <= end)
       || (this.start <= start && end <= this.end);
+  }
+  containsRegion([start, end]) {
+    return this.start <= start && end <= this.end;
   }
 }
 
