@@ -1,6 +1,6 @@
 {
   "name": "@lblod/marawa",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "module": "src",
   "scripts": {
     "test": "mocha --require babel-core/register",
