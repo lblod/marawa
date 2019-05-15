@@ -29,7 +29,7 @@ class RichNode {
     return diff;
   }
   isInRegion(start, end) {
-    return this.start >= start && this.end <= end;
+    return start <= this.start && this.end <= end;
   }
   isPartiallyInRegion(start, end) {
     return ( this.start >= start && this.start < end )
@@ -42,6 +42,9 @@ class RichNode {
     return (this.start >= start && this.start <= end)
       || (this.end >= start && this.end <= end)
       || (this.start <= start && end <= this.end);
+  }
+  containsRegion(start, end) {
+    return this.start <= start && end <= this.end;
   }
   isAncestorOf(richNode) {
     let node = richNode;
