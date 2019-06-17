@@ -40,6 +40,11 @@ class RichNode {
   isPartiallyOrFullyInRegion([start, end]) {
     if (start == undefined || end == undefined)
       return true;
+    return (this.start >= start && this.start <= end)
+      || (this.end >= start && this.end <= end)
+      || (this.start <= start && end <= this.end);
+  }
+  partiallyOrFullyContainsRegion([start,end]) {
     return (positionInRange(start, this.region) || positionInRange(end, this.region));
   }
   containsRegion(start, end) {
