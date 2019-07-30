@@ -18,4 +18,10 @@ function isEmptyRange([start, end]) {
   return end - start <= 0;
 }
 
-export { positionInRange }
+export {
+  positionInRange,
+  isLeftAdjacentRange,
+  isRightAdjacentRange,
+  isAdjacentRange,
+  isEmptyRange
+}
