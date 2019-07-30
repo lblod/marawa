@@ -58,6 +58,18 @@ class RdfaBlock {
   containsRegion([start, end]) {
     return this.start <= start && end <= this.end;
   }
+  /**
+   * Returns the absolute region based on the RDFa block region and a given relative region
+   *
+   * @method normalizeRegion
+   *
+   * @param {[int,int]} [start, end] Relative region offsets
+   *
+   * @return {[int,int]} [start, end] Absolute region offsets
+   */
+  normalizeRegion([relativeStart, relativeEnd]){
+    return [this.start + relativeStart, this.start + relativeEnd];
+  }
 }
 
 export default RdfaBlock;
