@@ -7,6 +7,8 @@ import { resolvePrefix } from './rdfa-helpers';
  * Note: The attributes of an existing RdfaAttributes object should not be updated.
  * A new RdfaAttributes object should be created in that case.
  *
+ * TODO: add support for language
+ *
  * @class RdfaAttributes
  * @constructor
 */
@@ -115,10 +117,10 @@ class RdfaAttributes {
    */
   resolvePrefixedAttributes() {
     const prefixableRdfaKeywords = [
-      'typeofs',
+      'typeof',
       'properties',
-      'rels',
-      'revs',
+      'rel',
+      'rev',
       'src',
       'href',
       'resource',
