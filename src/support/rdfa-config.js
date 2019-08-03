@@ -3,17 +3,19 @@ const prefixableRdfaKeywords = [
   'property',
   'src',
   'rel',
+  'rev',
   'href',
   'resource',
   'about',
   'datatype'
 ];
 
-const rdfaKeywords = prefixableRdfaKeywords.concat([
+const rdfaKeywords = [
+  ...prefixableRdfaKeywords,
   'vocab',
   'prefix',
   'content'
-]);
+];
 
 const defaultPrefixes = {
   as:	"https://www.w3.org/ns/activitystreams#",

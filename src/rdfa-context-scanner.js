@@ -475,13 +475,5 @@ function analyse(node, range){
   return (new RdfaContextScanner()).analyse( node, range );
 }
 
-/**
- * @deprecated
-*/
-function resolvePrefixes() {
-  console.warn(`[DEPRECATED] Method 'resolvePrefixes' from rdfa-context-scanner is deprecated. Use 'resolvePrefixedAttributes' from rdfa-helpers instead.`);
-  resolvePrefixedAttributes(...arguments);
-}
-
 export default RdfaContextScanner;
-export { analyse , resolvePrefixes };
+export { analyse };

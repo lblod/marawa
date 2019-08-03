@@ -1,8 +1,8 @@
 /**
  * Helpers to process RDFa on DOM nodes
  */
-
-import { rdfaKeywords, prefixableRdfaKeywords, defaultPrefixes } from './support/rdfa-config';
+import { defaultPrefixes } from './support/rdfa-config';
+import RdfaAttributes from './rdfa-attributes';
 
 /**
  * Enriches a rich node with semantic properties:
@@ -17,102 +17,17 @@ import { rdfaKeywords, prefixableRdfaKeywords, defaultPrefixes } from './support
  * @param {Object} parentPrefixes RDFa prefixes defined at the node's parent level
  */
 function enrichWithRdfaProperties(richNode, parentContext = [], parentPrefixes = defaultPrefixes) {
-  const rdfaAttributes = getRdfaAttributes(richNode.domNode);
+  const rdfaAttributes = new RdfaAttributes(richNode.domNode, parentPrefixes);
 
-  if (rdfaAttributes) {
-    const prefixes = mergePrefixes(parentPrefixes, rdfaAttributes);
-    const resolvedRdfaAttributes = resolvePrefixedAttributes(rdfaAttributes, prefixes);
-    richNode.rdfaPrefixes = prefixes;
-    richNode.rdfaAttributes = resolvedRdfaAttributes;
-    richNode.rdfaContext = parentContext.concat(resolvedRdfaAttributes);
+  if (!rdfaAttributes.isEmpty) {
+    richNode.rdfaPrefixes = rdfaAttributes.currentPrefixes;
+    richNode.rdfaAttributes = rdfaAttributes;
+    richNode.rdfaContext = [...parentContext, rdfaAttributes];
   } else {
     richNode.rdfaPrefixes = parentPrefixes;
     richNode.rdfaAttributes = null;
     richNode.rdfaContext = parentContext;
   }
-}
-
-/**
- * Get the RDFa attributes of a DOM node. Null if no RDFa attributes are set.
- * Supported RDFa attributes are configured in ./support/rdfa-config
- *
- * @method getRdfaAttributes
- *
- * @param {Node} domNode DOM node to get the RDFa attributes from
- *
- * @return {Object} Map of RDFa attributes key-value pairs
- */
-function getRdfaAttributes(domNode) {
-  if (domNode && domNode.getAttribute) {
-    const rdfaAttributes = {};
-
-    rdfaKeywords.forEach(function(key) {
-      rdfaAttributes[key] = domNode.getAttribute(key);
-    });
-
-    if (rdfaAttributes['typeof'] != null)
-      rdfaAttributes['typeof'] = rdfaAttributes['typeof'].split(' ');
-
-    rdfaAttributes['text'] = domNode.textContent;    
-
-    const isEmpty = function(rdfaAttributes) {
-      return rdfaKeywords
-        .map( (key) => rdfaAttributes[key] == null )
-        .reduce( (a,b) => a && b );
-    };
-    
-    return isEmpty(rdfaAttributes) ? null : rdfaAttributes;
-  } else {
-    return null;
-  }
-}
-
-/**
- * Create a map of RDFa prefixes by merging an existing map of RDFa prefixes with new RDFa attributes
- *
- * @method mergePrefixes
- *
- * @param {Object} prefixes An map of RDFa prefixes
- * @param {Object} rdfAttributes An RDFa attributes object
- *
- * @return {Object} An new map of RDFa prefixes
- */
-function mergePrefixes(prefixes, rdfaAttributes) {
-  const mergedPrefixes = Object.assign({}, prefixes);
-
-  if (rdfaAttributes && rdfaAttributes['vocab'] != null) {
-    mergedPrefixes[''] = rdfaAttributes['vocab'];
-  }
-  if (rdfaAttributes && rdfaAttributes['prefix'] != null) {
-    const parts = rdfaAttributes['prefix'].split(" ");
-    for(let i = 0; i < parts.length; i = i + 2) {
-      const key = parts[i].substr(0, parts[i].length - 1);
-      mergedPrefixes[key] = parts[i + 1];
-    }
-  }
-
-  return mergedPrefixes;
-}
-
-
-/**
- * Resolves the URIs in an RDFa attributes object with the correct prefix
- * based on a set of known prefixes.
- *
- * @method resolvePrefixedAttributes
- *
- * @param {Object} rdfaAttributes An object of RDFa attributes
- * @param {Object} prefixes A map of known prefixes
- *
- * @return {Object} A new RDFa attributes object containing resolved URIs
- */
-function resolvePrefixedAttributes(rdfaAttributes, prefixes) {
-  const clonedAttributes = Object.assign({}, rdfaAttributes);
-  prefixableRdfaKeywords.forEach( (key) => {
-    if (clonedAttributes[key] != null)
-      clonedAttributes[key] = resolvePrefix(clonedAttributes[key], prefixes);
-  });
-  return clonedAttributes;
 }
 
 /**
@@ -135,12 +50,12 @@ function resolvePrefix(uri, prefixes) {
 
       if (i < 0) { // no prefix defined. Use default.
         if (prefixes[''] == null)
-          console.warn(`No default RDFa prefix defined`, { id: 'rdfa.missingPrefix' });
+          console.warn(`No default RDFa prefix defined`, { id: 'rdfa-helpers.missingPrefix' });
         uri = prefixes[''] + uri;
       } else {
         const key = uri.substr(0, i);
         if (prefixes[key] == null)
-          console.warn(`No RDFa prefix '${key}' defined`, { id: 'rdfa.missingPrefix' });
+          console.warn(`No RDFa prefix '${key}' defined`, { id: 'rdfa-helpers.missingPrefix' });
         uri = prefixes[key] + uri.substr(i + 1);
       }
 
@@ -166,55 +81,52 @@ function resolvePrefix(uri, prefixes) {
  * @returns {Array} An array of triple objects
  */
 function rdfaAttributesToTriples(rdfaAttributes) {
-  const triples = [];
+  let graph = [];
 
   let currentScope = null;
 
   rdfaAttributes.forEach(function(rdfa) {
     let nextScope = null;
 
-    const triple = {};
+    let triples = [];
+
+    if (rdfa['properties'] != null) {
+      triples = rdfa['properties'].map( property => { return { predicate: property }; } );
+    }
+
+    triples.forEach(function(triple) {
+      triple.object = rdfa['content'] || rdfa['resource'] || rdfa['href'] || rdfa['text'];
+      triple.datatype = rdfa['datatype'];
+    });
 
     if (rdfa['about'] != null)
       currentScope = rdfa['about'];
-
-    if (rdfa['content'] != null)
-      triple.object = rdfa['content'];
-    if (rdfa['datatype'] != null)
-      triple.datatype = rdfa['datatype'];
-
-    if (rdfa['property'] != null) {
-      triple.predicate = rdfa['property'];
-
-      if (rdfa['href'] != null)
-        triple.object = rdfa['href'];
-
+    if (!triples.length) {
+      if (rdfa['resource'] != null) // resource is set without property/rel/rev
+        currentScope = rdfa['resource'];
+    } else {
       if (rdfa['resource'] != null) {
-        triple.object = rdfa['resource'];
         nextScope = rdfa['resource'];
       }
-
-      if (triple.object == null)
-        triple.object = rdfa.text;
-    } else {
-      if (rdfa['resource'] != null)
-        currentScope = rdfa['resource'];
     }
 
-    triple.subject = currentScope;
-    if (triple.predicate != null) {
-      triples.push(triple);
-    }
+    triples.forEach(function(triple) {
+      triple.subject = currentScope;
+    });
 
+    let typeofTriples = [];
     if (rdfa['typeof'] != null) {
-      rdfa['typeof'].forEach(function(type) {
-        triples.push({
-          subject: rdfa['resource'], // create a blank node if resource == null
+      typeofTriples = rdfa['typeof'].map(function(type) {
+        return {
+          // we assume typeof only applies on resource/about of current node. Not of a parent node.
+          subject: rdfa['resource'] || rdfa['about'], // create a blank node if subject == null
           predicate: 'a',
           object: type
-        });
+        };
       });
     }
+
+    graph = [...graph, ...triples, ...typeofTriples];
 
     // TODO: add support for 'rel' keyword: https://www.w3.org/TR/rdfa-primer/#alternative-for-setting-the-property-rel
     // TODO: add support for 'src' keyword
@@ -225,7 +137,7 @@ function rdfaAttributesToTriples(rdfaAttributes) {
     }
   });
 
-  return triples;
+  return graph;
 }
 
 /**
@@ -256,11 +168,8 @@ function isRelativeUrl(uri) {
 
 export {
   enrichWithRdfaProperties,
-  getRdfaAttributes,
-  mergePrefixes,  
-  resolvePrefixedAttributes,
   resolvePrefix,
-  rdfaAttributesToTriples,  
+  rdfaAttributesToTriples,
   isFullUri,
   isRelativeUrl
 }
