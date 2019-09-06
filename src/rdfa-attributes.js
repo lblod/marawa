@@ -83,14 +83,7 @@ class RdfaAttributes {
     }
 
     if (this._prefix != null) {
-      const parts = this._prefix.split(' ');
-      this.prefixes = {};
-      // parts is an array like ['mu:', 'http://mu.semte.ch...', 'ext:', 'http://...', ...]
-      // transform to an object like { mu: 'http://mu.semte.ch...', ext: 'http://...', ... }
-      for (let i = 0; i < parts.length; i = i + 2) {
-        const key = parts[i].substr(0, parts[i].length - 1);
-        this.prefixes[key] = parts[i + 1];
-      }
+      this.prefixes = parsePrefixString(this._prefix);
     } else {
       this.prefixes = null;
     }
@@ -136,5 +129,18 @@ class RdfaAttributes {
 
 }
 
-export default RdfaAttributes;
+const parsePrefixString = (prefixString) => {
+  const parts = prefixString.split(' ');
+  let prefixes = {};
+  // parts is an array like ['mu:', 'http://mu.semte.ch...', 'ext:', 'http://...', ...]
+  // transform to an object like { mu: 'http://mu.semte.ch...', ext: 'http://...', ... }
+  for (let i = 0; i < parts.length; i = i + 2) {
+  const key = parts[i].substr(0, parts[i].length - 1);
+  prefixes[key] = parts[i + 1];
+  }
 
+  return prefixes;
+};
+
+export default RdfaAttributes;
+export { parsePrefixString }
