@@ -34,7 +34,7 @@ class RdfaAttributes {
 
   get property() {
     console.warn(`[DEPRECATED] Property 'property' of RdfaAttributes is deprecated. Please use 'properties' instead.`);
-    return this._properties && this._properties.length && this._properties[0];
+    return this.properties && this.properties.length && this.properties[0];
   }
 
   /**
