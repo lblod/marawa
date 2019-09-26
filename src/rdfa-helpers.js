@@ -73,6 +73,10 @@ function resolvePrefix(uri, prefixes) {
 /**
  * Transforms an array of RDFa attribute objects to an array of triples.
  * A triple is an object consisting of a subject, predicate and object.
+ * Optionally, a triple can contain a datatype.
+ * In case object is an IRI, datatype is set to rdfs:Resource.
+ * In case object is a literal, dataype is set to the RDFa attributes datatype
+ * and null if no datatype is set in the RDFa attributes.
  *
  * @method rdfaAttributesToTriples
  *
@@ -123,11 +127,14 @@ function rdfaAttributesToTriples(rdfaAttributes) {
     [...propertyTriples, ...relTriples].forEach(triple => triple.subject = currentScope);
 
 
-    // Determine object
+    // Determine object and datatype
 
     propertyTriples.forEach(function(triple) {
       triple.object = rdfa['content'] || rdfa['resource'] || rdfa['href'] || rdfa['src'] || rdfa['text'];
-      triple.datatype = rdfa['datatype'];
+      if (rdfa['resource'] || rdfa['href'] || rdfa['src'])
+        triple.datatype = 'http://www.w3.org/2000/01/rdf-schema#Resource';
+      else
+        triple.datatype = rdfa['datatype'];
     });
 
     graph = [...graph, ...propertyTriples];
@@ -135,7 +142,10 @@ function rdfaAttributesToTriples(rdfaAttributes) {
     outstandingRelTriples = [...outstandingRelTriples, ...relTriples];
     const object = rdfa['resource'] || rdfa['href'] || rdfa['src']; // rel/rev never considers the textual content of an element as object
     if (object) {
-      outstandingRelTriples.forEach(triple => triple.object = object);
+      outstandingRelTriples.forEach(triple => {
+        triple.object = object;
+        triple.datatype = 'http://www.w3.org/2000/01/rdf-schema#Resource';
+      });
       graph = [...graph, ...outstandingRelTriples];
       outstandingRelTriples = [];
     };
@@ -150,7 +160,8 @@ function rdfaAttributesToTriples(rdfaAttributes) {
           // we assume typeof only applies on resource/about of current node. Not of a parent node.
           subject: rdfa['resource'] || rdfa['about'], // create a blank node if subject == null
           predicate: 'a',
-          object: type
+          object: type,
+          datatype: 'http://www.w3.org/2000/01/rdf-schema#Resource'
         };
       });
     }
