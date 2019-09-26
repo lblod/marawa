@@ -129,14 +129,22 @@ class RdfaAttributes {
 
 }
 
+/**
+ * Parses an RDFa prefix string and returns a map of prefixes to URIs.
+ * According to the RDFa spec prefixes must be seperated by exactly one space.
+ *
+ * @method parsePrefixString
+ * @param string prefixString Space-seperated string of RDFa prefixes
+ * @return Object Map of prefixes to their URI
+*/
 const parsePrefixString = (prefixString) => {
   const parts = prefixString.split(' ');
   let prefixes = {};
   // parts is an array like ['mu:', 'http://mu.semte.ch...', 'ext:', 'http://...', ...]
   // transform to an object like { mu: 'http://mu.semte.ch...', ext: 'http://...', ... }
   for (let i = 0; i < parts.length; i = i + 2) {
-  const key = parts[i].substr(0, parts[i].length - 1);
-  prefixes[key] = parts[i + 1];
+    const key = parts[i].substr(0, parts[i].length - 1);
+    prefixes[key] = parts[i + 1];
   }
 
   return prefixes;
