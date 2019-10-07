@@ -312,17 +312,19 @@ class RdfaContextScanner {
    * @private
    */
   createRdfaBlocksFromTag( richNode ){
+    const rdfaBlock = new RdfaBlock ({
+      start: richNode.start,
+      end: richNode.end || richNode.start,
+      region: richNode.region,
+      text: richNode.text,
+      context: rdfaAttributesToTriples(richNode.rdfaContext),
+      richNodes: [richNode],
+      isRdfaBlock: richNode.isLogicalBlock ,
+      semanticNode: ( richNode.isLogicalBlock && richNode )
+    });
+
     if ( !richNode.children || richNode.children.length == 0 ) { // an empty tag without text
-      return [ new RdfaBlock ({
-        start: richNode.start,
-        end: richNode.end || richNode.start,
-        region: richNode.region,
-        text: richNode.text,
-        context: rdfaAttributesToTriples(richNode.rdfaContext),
-        richNodes: [richNode],
-        isRdfaBlock: richNode.isLogicalBlock ,
-        semanticNode: ( richNode.isLogicalBlock && richNode )
-      }) ];
+      return [ rdfaBlock ];
     } else {
       const flatRdfaChildren = richNode.children
                                        .map( (child) => child.rdfaBlocks || [] )
@@ -336,14 +338,14 @@ class RdfaContextScanner {
 
       // override isRdfaBlock on each child, based on current node
       // set ourselves as semantic node on the child if it doesn't have one yet
-      if( richNode.isLogicalBlock  )
+      if( richNode.isLogicalBlock  ) {
         combinedChildren.forEach( (child) => {
           child.isRdfaBlock = true;
           if ( ! child.semanticNode  )
             child.semanticNode = richNode;
         });
-
-      return combinedChildren;
+      }
+      return [...combinedChildren, rdfaBlock];
     }
   }
 
