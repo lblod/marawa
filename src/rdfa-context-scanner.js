@@ -373,7 +373,7 @@ class RdfaContextScanner {
         region: [ start, end ],
         start: start,
         end: end,
-        text: left.text + right.text, // TODO: verify neither is undefined?
+        text: (left.text || '') + (right.text || ''),
         context: left.context,  // pick any of the two
         richNodes: combinedRichNodes,
         isRdfaBlock: false // these two nodes can be combined
