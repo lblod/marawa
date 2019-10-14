@@ -216,8 +216,22 @@ class RdfaContextScanner {
       let rdfaBlocks;
       if ( ! this.nodeIsLogicalBlock( node ) || node.isPartiallyOrFullyInRegion( [start, end] ) ) {
         rdfaBlocks = this.getRdfaBlockList( node );
-      } else {
-        // node is a logical block outside the range. It doesn't produce an RDFa block for the final result
+      }
+      else if ( this.nodeiIsLogicalBlock( node ) && node.isPartiallyOrFullyInRegion( [start, end ] )) {
+        const rdfaBlock = new RdfaBlock ({
+          start: richNode.start,
+          end: richNode.end || richNode.start,
+          region: richNode.region,
+          text: richNode.text,
+          context: rdfaAttributesToTriples(richNode.rdfaContext),
+          richNodes: [richNode],
+          isRdfaBlock: richNode.isLogicalBlock ,
+          semanticNode: ( richNode.isLogicalBlock && richNode )
+        });
+        rdfaBlocks = [rdfaBlock];
+      }
+      else {
+        // node is outside the range. It doesn't produce an RDFa block for the final result
         rdfaBlocks = [];
       }
 
@@ -345,7 +359,7 @@ class RdfaContextScanner {
             child.semanticNode = richNode;
         });
       }
-      return [...combinedChildren, rdfaBlock];
+      return [...combinedChildren];
     }
   }
 
