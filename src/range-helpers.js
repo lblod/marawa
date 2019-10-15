@@ -2,6 +2,14 @@ function positionInRange(position, [start, end]) {
   return position >= start && position <= end;
 };
 
+/**
+ * this methods checks if rangeA fully or partially contained in B
+ */
+function rangeAStartsOrEndsinB(rangeA, rangeB) {
+  const [start, end] = rangeA;
+  return positionInRange(start, rangeB) || positionInRange(end, rangeB);
+}
+
 function isLeftAdjacentRange([neighbourStart, neighbourEnd], [start, end]) {
   return neighbourEnd == start;
 }
@@ -18,10 +26,16 @@ function isEmptyRange([start, end]) {
   return end - start <= 0;
 }
 
+function isEqualRange([startA, endA], [startB, endB]) {
+  return startA == startB && endA == endB;
+}
+
 export {
   positionInRange,
   isLeftAdjacentRange,
   isRightAdjacentRange,
   isAdjacentRange,
-  isEmptyRange
+  isEmptyRange,
+  isEqualRange,
+  rangeAStartsOrEndsinB
 }
