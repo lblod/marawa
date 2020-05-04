@@ -7,6 +7,6 @@ Developing with marawa implies three steps :
 - linking marawa to the application that uses it (/!\ marawa might be used at several places in the same project (like frontend + a plugin used by the frontend), double check it is linked at all the relevant places)
 - preparing the package
 ```
-npm run-scripts prepare
+npm run-script prepare
 ```
 - restarting the frontend
