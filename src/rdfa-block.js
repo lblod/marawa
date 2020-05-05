@@ -1,3 +1,5 @@
+import { rdfaAttributesToTriples } from './rdfa-helpers';
+
 /**
  * Represents a logical block, a combination of one or more RichNodes,
  * that share the same semantic meaning (in terms of RDFa as well as in terms of display).
@@ -58,6 +60,7 @@ class RdfaBlock {
   containsRegion([start, end]) {
     return this.start <= start && end <= this.end;
   }
+
   /**
    * Returns the absolute region based on the RDFa block region and a given relative region
    *
@@ -67,8 +70,56 @@ class RdfaBlock {
    *
    * @return {[int,int]} [start, end] Absolute region offsets
    */
-  normalizeRegion([relativeStart, relativeEnd]){
+  normalizeRegion([relativeStart, relativeEnd]) {
     return [this.start + relativeStart, this.start + relativeEnd];
+  }
+
+  /**
+   * Returns the RDFa blocks representing the parent of a given block.
+   *
+   * @method getParentBlocks
+   *
+   * @param {RdfaBlock} rdfaBlock Block to start from
+   *
+   * @return {[RdfaBlock]} Array of RDFa blocks representing the RDFa context of the parents of a given rdfa block.
+   */
+  getParentBlocks(block) {
+    let parents = [];
+    block.richNodes.forEach(node => {
+      parents = parents.concat(block.getParentBlocksFromRichNode(node));
+    });
+    return parents;
+  }
+
+  /**
+   * Returns the RDFa blocks representing the parent of a given rich node.
+   *
+   * @method getParentBlocksFromRichNode
+   *
+   * @param {RichNode} richNode Rich node to start from
+   *
+   * @return {[RdfaBlock]} Array of RDFa blocks representing the RDFa context of the parents of a given rich node.
+   */
+  getParentBlocksFromRichNode(richNode, parentBlocks=[]) {
+    if (richNode.rdfaAttributes) {
+      const newParentBlock = new RdfaBlock ({
+        start: richNode.start,
+        end: richNode.end || richNode.start,
+        region: richNode.region,
+        text: richNode.text,
+        context: rdfaAttributesToTriples(richNode.rdfaContext),
+        richNodes: [richNode],
+        isRdfaBlock: richNode.isLogicalBlock ,
+        semanticNode: ( richNode.isLogicalBlock && richNode )
+      });
+      parentBlocks.push(newParentBlock);
+    }
+
+    if (!richNode.parent) {
+      return parentBlocks;
+    } else {
+      return this.getParentBlocksFromRichNode(richNode.parent, parentBlocks);
+    }
   }
 }
 
