@@ -84,7 +84,7 @@ function resolvePrefix(uri, prefixes) {
  *
  * @returns {Array} An array of triple objects
  */
-function rdfaAttributesToTriples(rdfaAttributes) {
+function rdfaAttributesToTriples(rdfaAttributes, baseUri=null) {
   let graph = [];
 
   let currentScope = null;
@@ -103,6 +103,12 @@ function rdfaAttributesToTriples(rdfaAttributes) {
     let relTriples = (rdfa['rel'] || []).map( rel => { return { predicate: rel }; } );
     const revTriples = (rdfa['rev'] || []).map( rev => { return { predicate: `^${rev}` }; } );
     relTriples = [...relTriples, ...revTriples];
+
+    // Update the resource if it is a relative uri
+
+    if (rdfa['resource'] && rdfa['resource'].startsWith('#') && baseUri) {
+      rdfa['resource'] = (new URL(rdfa['resource'], baseUri)).toString();
+    }
 
     // Determine subject
 
