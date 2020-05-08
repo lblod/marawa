@@ -16,8 +16,8 @@ import RdfaAttributes from './rdfa-attributes';
  * @param {Array} parentContext RDFa context (array of rdfaAttributes) of the node's parent
  * @param {Object} parentPrefixes RDFa prefixes defined at the node's parent level
  */
-function enrichWithRdfaProperties(richNode, parentContext = [], parentPrefixes = defaultPrefixes) {
-  const rdfaAttributes = new RdfaAttributes(richNode.domNode, parentPrefixes);
+function enrichWithRdfaProperties(richNode, parentContext = [], parentPrefixes = defaultPrefixes, options = {}) {
+  const rdfaAttributes = new RdfaAttributes(richNode.domNode, parentPrefixes, options);
 
   if (!rdfaAttributes.isEmpty) {
     richNode.rdfaPrefixes = rdfaAttributes.currentPrefixes;
@@ -41,9 +41,11 @@ function enrichWithRdfaProperties(richNode, parentContext = [], parentPrefixes =
  *
  * @return {string} The resolved URI
  */
-function resolvePrefix(uri, prefixes) {
+function resolvePrefix(uri, prefixes, documentUrl) {
   const resolve = (uri) => {
-    if (isFullUri(uri) || isRelativeUrl(uri)) {
+    if (isRelativeUrl(uri) && documentUrl) {
+      return (new URL(uri, documentUrl)).toString();
+    } else if (isFullUri(uri) || isRelativeUrl(uri)) {
       return uri;
     } else {
       const i = uri.indexOf(':');
@@ -84,7 +86,7 @@ function resolvePrefix(uri, prefixes) {
  *
  * @returns {Array} An array of triple objects
  */
-function rdfaAttributesToTriples(rdfaAttributes, baseUri=null) {
+function rdfaAttributesToTriples(rdfaAttributes) {
   let graph = [];
 
   let currentScope = null;
@@ -96,19 +98,12 @@ function rdfaAttributesToTriples(rdfaAttributes, baseUri=null) {
   rdfaAttributes.forEach(function(rdfa) {
     let nextScope = null;  // subject of the next iteration
 
-
     // Determine predicates
 
     const propertyTriples = (rdfa['properties'] || []).map( property => { return { predicate: property }; } );
     let relTriples = (rdfa['rel'] || []).map( rel => { return { predicate: rel }; } );
     const revTriples = (rdfa['rev'] || []).map( rev => { return { predicate: `^${rev}` }; } );
     relTriples = [...relTriples, ...revTriples];
-
-    // Update the resource if it is a relative uri
-
-    if (rdfa['resource'] && rdfa['resource'].startsWith('#') && baseUri) {
-      rdfa['resource'] = (new URL(rdfa['resource'], baseUri)).toString();
-    }
 
     // Determine subject
 

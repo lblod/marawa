@@ -1,5 +1,5 @@
 import { walk, isVoidElement } from './node-walker';
-import { enrichWithRdfaProperties, resolvePrefixedAttributes, rdfaAttributesToTriples } from './rdfa-helpers';
+import { enrichWithRdfaProperties, rdfaAttributesToTriples } from './rdfa-helpers';
 import RdfaBlock from './rdfa-block';
 import RichNode from './rich-node';
 // TODO: Research a way to alter the imports when used in an Ember application
@@ -22,7 +22,7 @@ class RdfaContextScanner {
    * @param {[number,number]} region Region in the text for which RDFa contexts must be calculated.
    *                                 Full region if start or end is undefined.
    * @param {Options} options Options provided to the method:
-   *                            - baseUri: the base uri to apply to relative uris
+   *                            - documentUrl: the url of the document to be applied to relative urls
    *
    * @return {[RdfaBlock]} Array of RDFa blocks representing the RDFa context of the given region in a given DOM node.
    *                 It's important to note that the resulting RDFa blocks might span a broader range than the requested range
@@ -45,10 +45,10 @@ class RdfaContextScanner {
       return [];
 
     const richNode = walk(domNode);
-    this.calculateRdfaToTop(richNode);
-    this.calculateInnerRdfa(richNode);
+    this.calculateRdfaToTop(richNode, options);
+    this.calculateInnerRdfa(richNode, options);
 
-    const rdfaBlocks = this.flattenRdfaTree(richNode, [start, end], options);
+    const rdfaBlocks = this.flattenRdfaTree(richNode, [start, end]);
 
     let resultingBlocks;
 
@@ -75,10 +75,12 @@ class RdfaContextScanner {
    * @method calculateRdfaToTop
    *
    * @param {RichNode} richNode Rich node to start from
+   * @param {Options} options Options provided to the method:
+   *                            - documentUrl: the url of the document to be applied to relative urls
    *
    * @private
    */
-  calculateRdfaToTop(startNode) {
+  calculateRdfaToTop(startNode, options={}) {
     const richNodesOnPath = [startNode];
 
     for(let domNode = startNode.domNode.parentNode; domNode; domNode = domNode.parentNode) {
@@ -92,11 +94,11 @@ class RdfaContextScanner {
 
     richNodesOnPath.forEach((richNode, i) => {
       if (i == 0) {
-        enrichWithRdfaProperties(richNode);
+        enrichWithRdfaProperties(richNode, [], null, options);
       } else {
         const parent = richNodesOnPath[i-1];
         richNode.parent = parent;
-        enrichWithRdfaProperties(richNode, parent.rdfaContext, parent.rdfaPrefixes);
+        enrichWithRdfaProperties(richNode, parent.rdfaContext, parent.rdfaPrefixes, options);
       }
     });
   }
@@ -108,13 +110,15 @@ class RdfaContextScanner {
    * @method calculateInnerRdfa
    *
    * @param {RichNode} richNode Rich node to start from
+   * @param {Options} options Options provided to the method:
+   *                            - documentUrl: the url of the document to be applied to relative urls
    *
    * @private
    */
-  calculateInnerRdfa(richNode) {
+  calculateInnerRdfa(richNode, options={}) {
     (richNode.children || []).forEach((child) => {
-      enrichWithRdfaProperties(child, richNode.rdfaContext, richNode.rdfaPrefixes);
-      this.calculateInnerRdfa(child);
+      enrichWithRdfaProperties(child, richNode.rdfaContext, richNode.rdfaPrefixes, options);
+      this.calculateInnerRdfa(child, options);
     });
   }
 
@@ -181,14 +185,12 @@ class RdfaContextScanner {
    *
    * @param {RichNode} richNode Rich node to flatten
    * @param {[number,number]} region Region in the text for which RDFa nodes must be returned
-   * @param {Options} options Options provided to the method:
-   *                            - baseUri: the base uri to apply to relative uris
    *
    * @return {[RdfaBlock]} Array of RDFa blocks falling in a specified region
    *
    * @private
    */
-  flattenRdfaTree(richNode, [start, end]=[], options={}) {
+  flattenRdfaTree(richNode, [start, end]=[]) {
     // The desired outcome for a given [start, end] consists of all
     // lowest level logical blocks which overlap with [start, end].
     // full contents of all lowest-level logical blocks which
@@ -209,7 +211,7 @@ class RdfaContextScanner {
       const shouldScanFurther = node.isPartiallyOrFullyInRegion( [start, end] )
             || ! this.nodeIsLogicalBlock( node );
       if ( shouldScanFurther ) {
-        this.flattenRdfaTree( node, [ start, end ], options );
+        this.flattenRdfaTree( node, [ start, end ] );
       } // else {
         //   node is a logical block outside the range
         //   it cannot be combined with a block in the range so it can be ignored
@@ -220,7 +222,7 @@ class RdfaContextScanner {
     const finishChildSteps = (node) => {
       let rdfaBlocks;
       if ( ! this.nodeIsLogicalBlock( node ) || node.isPartiallyOrFullyInRegion( [start, end] ) ) {
-        rdfaBlocks = this.getRdfaBlockList( node, options );
+        rdfaBlocks = this.getRdfaBlockList( node );
       }
       else if ( this.nodeiIsLogicalBlock( node ) && node.isPartiallyOrFullyInRegion( [start, end ] )) {
         const rdfaBlock = new RdfaBlock ({
@@ -228,7 +230,7 @@ class RdfaContextScanner {
           end: richNode.end || richNode.start,
           region: richNode.region,
           text: richNode.text,
-          context: rdfaAttributesToTriples(richNode.rdfaContext, options.baseUri),
+          context: rdfaAttributesToTriples(richNode.rdfaContext),
           richNodes: [richNode],
           isRdfaBlock: richNode.isLogicalBlock ,
           semanticNode: ( richNode.isLogicalBlock && richNode )
@@ -258,22 +260,20 @@ class RdfaContextScanner {
    * @method getRdfaNodeList
    *
    * @param {RichNode} richNode The node for which to return the rdfaNodeList.
-   * @param {Options} options Options provided to the method:
-   *                            - baseUri: the base uri to apply to relative uris
    *
    * @return {[RdfaBlock]} Array of rdfaBlock items.
    *
    * @private
    */
-  getRdfaBlockList( richNode, options={} ){
+  getRdfaBlockList( richNode ){
     switch( richNode.type ){
       case "text":
-        return this.createRdfaBlocksFromText( richNode, options );
+        return this.createRdfaBlocksFromText( richNode );
       case "tag":
         if( isVoidElement( richNode.domNode ) ) {
-          return this.createRdfaBlocksFromText( richNode, options );
+          return this.createRdfaBlocksFromText( richNode );
         } else {
-          return this.createRdfaBlocksFromTag( richNode, options );
+          return this.createRdfaBlocksFromTag( richNode );
         }
       default:
         return [];
@@ -288,20 +288,18 @@ class RdfaContextScanner {
    *
    * @param {RichNode} richNode The text node for which to return the
    * rdfa blocks.
-   * @param {Options} options Options provided to the method:
-   *                            - baseUri: the base uri to apply to relative uris
    *
    * @return {[RdfaBlock]} Array of rdfaBlock items.
    *
    * @private
    */
-  createRdfaBlocksFromText( richNode, options={} ){
+  createRdfaBlocksFromText( richNode ){
     return [ new RdfaBlock({
       start: richNode.start,
       end: richNode.end || richNode.start,
       region: richNode.region,
       text: richNode.text,
-      context: rdfaAttributesToTriples(richNode.rdfaContext, options.baseUri),
+      context: rdfaAttributesToTriples(richNode.rdfaContext),
       richNodes: [richNode],
       isRdfaBlock: richNode.isLogicalBlock ,
       semanticNode: ( richNode.isLogicalBlock && richNode )
@@ -329,20 +327,18 @@ class RdfaContextScanner {
    *
    * @param {RichNode} richNode RichNode for which the rdfaBlock items
    * will be returned.
-   * @param {Options} options Options provided to the method:
-   *                            - baseUri: the base uri to apply to relative uris
    *
    * @return {[RdfaBlock]} Array of rdfaBlock items for this tag.
    *
    * @private
    */
-  createRdfaBlocksFromTag( richNode, options={} ){
+  createRdfaBlocksFromTag( richNode ){
     const rdfaBlock = new RdfaBlock ({
       start: richNode.start,
       end: richNode.end || richNode.start,
       region: richNode.region,
       text: richNode.text,
-      context: rdfaAttributesToTriples(richNode.rdfaContext, options.baseUri),
+      context: rdfaAttributesToTriples(richNode.rdfaContext),
       richNodes: [richNode],
       isRdfaBlock: richNode.isLogicalBlock ,
       semanticNode: ( richNode.isLogicalBlock && richNode )
@@ -498,7 +494,7 @@ class RdfaContextScanner {
  * @param {[number,number]} region Region in the text for which RDFa contexts must be calculated.
  *                                 Full region if start or end is undefined.
  * @param {Options} options Options provided to the method:
- *                            - baseUri: the base uri to apply to relative ur
+ *                            - documentUrl: the url of the document to be applied to relative urls
  *
  * @return {[RichNode]} RichNodes containing the analysed node
  */
