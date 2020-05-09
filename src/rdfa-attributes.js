@@ -59,7 +59,7 @@ class RdfaAttributes {
     this.currentPrefixes = Object.assign({}, knownPrefixes);
     this.splitMultivalueAttributes();
     this.updateCurrentPrefixes();
-    this.resolvePrefixedAttributes(this.documentUrl);
+    this.resolvePrefixedAttributes();
   }
 
   /**
