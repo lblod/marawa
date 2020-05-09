@@ -20,8 +20,9 @@ class RdfaAttributes {
         this[`_${key}`] = domNode.getAttribute(key);
       };
       this.text = domNode.textContent;
+      this.documentUrl = options.documentUrl;
 
-      this.setResolvedAttributes(knownPrefixes, options.documentUrl);
+      this.setResolvedAttributes(knownPrefixes);
     }
   }
 
@@ -54,11 +55,11 @@ class RdfaAttributes {
    * _attributes (e.g. _properties): an array of values for attributes that are multivalued. Null if not set.
    * attribute (e.g. properties): (array of) values with resolved prefixes
   */
-  setResolvedAttributes(knownPrefixes, documentUrl) {
+  setResolvedAttributes(knownPrefixes) {
     this.currentPrefixes = Object.assign({}, knownPrefixes);
     this.splitMultivalueAttributes();
     this.updateCurrentPrefixes();
-    this.resolvePrefixedAttributes(documentUrl);
+    this.resolvePrefixedAttributes(this.documentUrl);
   }
 
   /**
@@ -109,7 +110,7 @@ class RdfaAttributes {
    * @private
    * @method resolvePrefixedAttributes
    */
-  resolvePrefixedAttributes(documentUrl) {
+  resolvePrefixedAttributes() {
     const prefixableRdfaKeywords = [
       'typeof',
       'properties',
@@ -124,7 +125,7 @@ class RdfaAttributes {
 
     prefixableRdfaKeywords.forEach( (key) => {
       if (this[`_${key}`] != null) {
-        this[key] = resolvePrefix(this[`_${key}`], this.currentPrefixes, documentUrl);
+        this[key] = resolvePrefix(this[`_${key}`], this.currentPrefixes, this.documentUrl);
       }
     });
   }
