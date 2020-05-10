@@ -14,12 +14,14 @@ import { resolvePrefix } from './rdfa-helpers';
 */
 class RdfaAttributes {
 
-  constructor(domNode, knownPrefixes = defaultPrefixes) {
+  constructor(domNode, knownPrefixes = defaultPrefixes, options = {}) {
     if (domNode && domNode.getAttribute) {
       for (let key of rdfaKeywords) {
         this[`_${key}`] = domNode.getAttribute(key);
       };
       this.text = domNode.textContent;
+      this.documentUrl = options.documentUrl;
+
       this.setResolvedAttributes(knownPrefixes);
     }
   }
@@ -122,8 +124,9 @@ class RdfaAttributes {
     ];
 
     prefixableRdfaKeywords.forEach( (key) => {
-      if (this[`_${key}`] != null)
-        this[key] = resolvePrefix(this[`_${key}`], this.currentPrefixes);
+      if (this[`_${key}`] != null) {
+        this[key] = resolvePrefix(this[`_${key}`], this.currentPrefixes, this.documentUrl);
+      }
     });
   }
 

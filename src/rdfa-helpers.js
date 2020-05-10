@@ -16,8 +16,8 @@ import RdfaAttributes from './rdfa-attributes';
  * @param {Array} parentContext RDFa context (array of rdfaAttributes) of the node's parent
  * @param {Object} parentPrefixes RDFa prefixes defined at the node's parent level
  */
-function enrichWithRdfaProperties(richNode, parentContext = [], parentPrefixes = defaultPrefixes) {
-  const rdfaAttributes = new RdfaAttributes(richNode.domNode, parentPrefixes);
+function enrichWithRdfaProperties(richNode, parentContext = [], parentPrefixes = defaultPrefixes, options = {}) {
+  const rdfaAttributes = new RdfaAttributes(richNode.domNode, parentPrefixes, options);
 
   if (!rdfaAttributes.isEmpty) {
     richNode.rdfaPrefixes = rdfaAttributes.currentPrefixes;
@@ -41,9 +41,11 @@ function enrichWithRdfaProperties(richNode, parentContext = [], parentPrefixes =
  *
  * @return {string} The resolved URI
  */
-function resolvePrefix(uri, prefixes) {
+function resolvePrefix(uri, prefixes, documentUrl) {
   const resolve = (uri) => {
-    if (isFullUri(uri) || isRelativeUrl(uri)) {
+    if (isRelativeUrl(uri) && documentUrl) {
+      return (new URL(uri, documentUrl)).toString();
+    } else if (isFullUri(uri) || isRelativeUrl(uri)) {
       return uri;
     } else {
       const i = uri.indexOf(':');
@@ -95,7 +97,6 @@ function rdfaAttributesToTriples(rdfaAttributes) {
 
   rdfaAttributes.forEach(function(rdfa) {
     let nextScope = null;  // subject of the next iteration
-
 
     // Determine predicates
 

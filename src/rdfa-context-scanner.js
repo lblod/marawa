@@ -1,5 +1,5 @@
 import { walk, isVoidElement } from './node-walker';
-import { enrichWithRdfaProperties, resolvePrefixedAttributes, rdfaAttributesToTriples } from './rdfa-helpers';
+import { enrichWithRdfaProperties, rdfaAttributesToTriples } from './rdfa-helpers';
 import RdfaBlock from './rdfa-block';
 import RichNode from './rich-node';
 // TODO: Research a way to alter the imports when used in an Ember application
@@ -14,12 +14,15 @@ import RichNode from './rich-node';
 class RdfaContextScanner {
   /**
    * Analyse the RDFa contexts of a specific region in a text
+   * /!\ Can be called by a shorthand below this class /!\
    *
    * @method analyse
    *
    * @param {Node} domNode Root DOM node containing the text
    * @param {[number,number]} region Region in the text for which RDFa contexts must be calculated.
    *                                 Full region if start or end is undefined.
+   * @param {Options} options Options provided to the method:
+   *                            - documentUrl: the url of the document to be applied to relative urls
    *
    * @return {[RdfaBlock]} Array of RDFa blocks representing the RDFa context of the given region in a given DOM node.
    *                 It's important to note that the resulting RDFa blocks might span a broader range than the requested range
@@ -36,14 +39,14 @@ class RdfaContextScanner {
    *
    * @public
    */
-  analyse(domNode, [start, end] = []) {
+  analyse(domNode, region=[], options={}) {
+    const [start, end] = region;
     if (domNode == null || start < 0 || end < start)
       return [];
 
     const richNode = walk(domNode);
-
-    this.calculateRdfaToTop(richNode);
-    this.calculateInnerRdfa(richNode);
+    this.calculateRdfaToTop(richNode, options);
+    this.calculateInnerRdfa(richNode, options);
 
     const rdfaBlocks = this.flattenRdfaTree(richNode, [start, end]);
 
@@ -72,10 +75,12 @@ class RdfaContextScanner {
    * @method calculateRdfaToTop
    *
    * @param {RichNode} richNode Rich node to start from
+   * @param {Options} options Options provided to the method:
+   *                            - documentUrl: the url of the document to be applied to relative urls
    *
    * @private
    */
-  calculateRdfaToTop(startNode) {
+  calculateRdfaToTop(startNode, options={}) {
     const richNodesOnPath = [startNode];
 
     for(let domNode = startNode.domNode.parentNode; domNode; domNode = domNode.parentNode) {
@@ -89,11 +94,11 @@ class RdfaContextScanner {
 
     richNodesOnPath.forEach((richNode, i) => {
       if (i == 0) {
-        enrichWithRdfaProperties(richNode);
+        enrichWithRdfaProperties(richNode, [], null, options);
       } else {
         const parent = richNodesOnPath[i-1];
         richNode.parent = parent;
-        enrichWithRdfaProperties(richNode, parent.rdfaContext, parent.rdfaPrefixes);
+        enrichWithRdfaProperties(richNode, parent.rdfaContext, parent.rdfaPrefixes, options);
       }
     });
   }
@@ -105,13 +110,15 @@ class RdfaContextScanner {
    * @method calculateInnerRdfa
    *
    * @param {RichNode} richNode Rich node to start from
+   * @param {Options} options Options provided to the method:
+   *                            - documentUrl: the url of the document to be applied to relative urls
    *
    * @private
    */
-  calculateInnerRdfa(richNode) {
+  calculateInnerRdfa(richNode, options={}) {
     (richNode.children || []).forEach((child) => {
-      enrichWithRdfaProperties(child, richNode.rdfaContext, richNode.rdfaPrefixes);
-      this.calculateInnerRdfa(child);
+      enrichWithRdfaProperties(child, richNode.rdfaContext, richNode.rdfaPrefixes, options);
+      this.calculateInnerRdfa(child, options);
     });
   }
 
@@ -484,11 +491,15 @@ class RdfaContextScanner {
  * @method analyse
  *
  * @param {Node} node Node to be analysed
+ * @param {[number,number]} region Region in the text for which RDFa contexts must be calculated.
+ *                                 Full region if start or end is undefined.
+ * @param {Options} options Options provided to the method:
+ *                            - documentUrl: the url of the document to be applied to relative urls
  *
  * @return {[RichNode]} RichNodes containing the analysed node
  */
-function analyse(node, range){
-  return (new RdfaContextScanner()).analyse( node, range );
+function analyse(node, region = [], options = {}) {
+  return (new RdfaContextScanner()).analyse( node, region, options );
 }
 
 export default RdfaContextScanner;
