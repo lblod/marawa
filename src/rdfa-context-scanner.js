@@ -94,7 +94,7 @@ class RdfaContextScanner {
 
     richNodesOnPath.forEach((richNode, i) => {
       if (i == 0) {
-        enrichWithRdfaProperties(richNode, [], null, options);
+        enrichWithRdfaProperties(richNode, undefined, undefined, options);
       } else {
         const parent = richNodesOnPath[i-1];
         richNode.parent = parent;
