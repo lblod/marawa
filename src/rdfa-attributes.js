@@ -125,7 +125,7 @@ class RdfaAttributes {
 
     prefixableRdfaKeywords.forEach( (key) => {
       if (this[`_${key}`] != null) {
-        this[key] = resolvePrefix(this[`_${key}`], this.currentPrefixes, this.documentUrl);
+        this[key] = resolvePrefix(key, this[`_${key}`], this.currentPrefixes, this.documentUrl);
       }
     });
   }
