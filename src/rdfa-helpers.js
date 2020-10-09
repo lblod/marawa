@@ -34,28 +34,48 @@ function enrichWithRdfaProperties(richNode, parentContext = [], parentPrefixes =
  * Resolves a given (array of) URI(s) with the correct prefix (if it's prefixed)
  * based on a set of known prefixes.
  *
+ * TODO: likely a lot of cases are missed here, and the spec should be studied carefully.
+ *
  * @method resolvePrefix
  *
+ * @param {string} the name of the attribute where the URI(s) are matched
  * @param {string|Array} uri An (array of) URI(s) to resolve
  * @param {Object} prefixes A map of known prefixes
+ * @param {string} [OPTIONAL] the URL of the document where potentialy may be resolve against
  *
  * @return {string} The resolved URI
  */
-function resolvePrefix(uri, prefixes, documentUrl) {
-  const resolve = (uri) => {
-    if (isRelativeUrl(uri) && documentUrl) {
-      return (new URL(uri, documentUrl)).toString();
-    } else if (isFullUri(uri) || isRelativeUrl(uri)) {
-      return uri;
-    } else {
-      }
+function resolvePrefix(attribute, uri, prefixes, documentUrl) {
 
+  var mayUseDefaultVocab = function ( attribute ) {
+    //TODO: 'properties' should be 'property', but it has big impact if we change the name (hence the weird mapping)
+    var mappedName = attribute == 'properties' ? 'property' : attribute;
+    return ['typeof', 'property', 'rel', 'rev', 'datatype'].includes(mappedName);
+  };
+
+  var resolve = function resolve(uri) {
+
+    //Full URI wins
+    if(isFullUri(uri)){
       return uri;
+    }
+
+    //Prefixed URI or may resolve with default vocab
+    else if(isPrefixedUri(uri) || mayUseDefaultVocab(attribute)) {
+      return tryResolveURIAgainstPrefixes(uri, prefixes);
+    }
+
+    //Hence we assume it will be a path that needs be resolved
+    else {
+      //should be [ 'resoure', 'href', 'src', 'about' ]
+      return tryResolvePathToURI(uri, documentUrl);
     }
   };
 
   if (Array.isArray(uri)) {
-    return uri.map( u => resolve(u));
+    return uri.map(function (u) {
+      return resolve(u);
+    });
   } else {
     return resolve(uri);
   }
