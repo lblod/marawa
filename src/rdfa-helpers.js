@@ -211,17 +211,18 @@ function rdfaAttributesToTriples(rdfaAttributes) {
  * @return {boolean} Whether the given URI is a full URI.
  */
 function isFullUri(uri) {
-  return uri.includes('://');
+  return uri.includes('://'); //TODO: won't this break against /foo/bar?param="http://bar/baz"
 }
 
 /**
- * Returns whether a given URI is a relative URI.
+ * Returns whether a given URI is prefixed
  *
- * @method isRelativeUrl
+ * @method isPrefixedUri
  *
  * @param {string} uri A URI
  *
- * @return {boolean} Whether the given URI is a relative URI.
+ * @return {boolean} Whether the given URI is prefixed
+ */
 function isPrefixedUri(uri) {
   if(isFullUri(uri)){
     return false;
@@ -236,6 +237,7 @@ function isPrefixedUri(uri) {
     //see https://en.wikipedia.org/wiki/CURIE
     return /^\[?[a-z][a-z|\d|\.|\+|\-]*:$/i.test(potentialPrefix);
   }
+}
 
 /**
  * Tries to resolve a relative path to a full URI
@@ -271,8 +273,6 @@ function tryResolvePathToURI(path, documentUrl){
  * @return {string} The resolved URI (if possible)
  *
  */
-function isRelativeUrl(uri) {
-  return uri.startsWith('#') || uri.startsWith('/') || uri.startsWith('./') || uri.startsWith('../');
 function tryResolveURIAgainstPrefixes(uri, prefixes){
   //Try expanding the uri
   var i = uri.indexOf(':');
@@ -310,5 +310,5 @@ export {
   resolvePrefix,
   rdfaAttributesToTriples,
   isFullUri,
-  isRelativeUrl
+  isPrefixedUri
 }
