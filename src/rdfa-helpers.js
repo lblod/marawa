@@ -48,17 +48,6 @@ function resolvePrefix(uri, prefixes, documentUrl) {
     } else if (isFullUri(uri) || isRelativeUrl(uri)) {
       return uri;
     } else {
-      const i = uri.indexOf(':');
-
-      if (i < 0) { // no prefix defined. Use default.
-        if (prefixes[''] == null)
-          console.warn(`No default RDFa prefix defined`, { id: 'rdfa-helpers.missingPrefix' });
-        uri = prefixes[''] + uri;
-      } else {
-        const key = uri.substr(0, i);
-        if (prefixes[key] == null)
-          console.warn(`No RDFa prefix '${key}' defined`, { id: 'rdfa-helpers.missingPrefix' });
-        uri = prefixes[key] + uri.substr(i + 1);
       }
 
       return uri;
@@ -250,9 +239,50 @@ function tryResolvePathToURI(path, documentUrl){
   }
 
 }
+
+/**
+ * Tries to resolve the URI against list of prefixes or default vocabulary
+ *
+ * @method tryResolveURIAgainstPrefixes
+ *
+ * @param {string} uri A URI or CURIE (not safe CURIE (TODO))
+ * @param {Object} prefixes A map of known prefixes
+ *
+ * @return {string} The resolved URI (if possible)
+ *
  */
 function isRelativeUrl(uri) {
   return uri.startsWith('#') || uri.startsWith('/') || uri.startsWith('./') || uri.startsWith('../');
+function tryResolveURIAgainstPrefixes(uri, prefixes){
+  //Try expanding the uri
+  var i = uri.indexOf(':');
+
+  if (i < 0) {
+
+    // no prefix defined. Use default.
+    if (prefixes[''] == null){
+      console.warn('No default RDFa prefix defined', { id: 'rdfa-helpers.expandPrefixedUri' });
+      return uri;
+    }
+
+    else {
+      return prefixes[''] + uri;
+    }
+
+  }
+
+  else {
+
+    var key = uri.substr(0, i);
+
+    if (prefixes[key] == null){
+      console.warn('No RDFa prefix \'' + key + '\' defined', { id: 'rdfa-helpers.expandPrefixedUri' });
+      return uri;
+    }
+    else {
+      return prefixes[key] + uri.substr(i + 1);
+    }
+  }
 }
 
 export {
