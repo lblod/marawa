@@ -227,6 +227,28 @@ function isPrefixedUri(uri) {
     //see https://en.wikipedia.org/wiki/CURIE
     return /^\[?[a-z][a-z|\d|\.|\+|\-]*:$/i.test(potentialPrefix);
   }
+
+/**
+ * Tries to resolve a relative path to a full URI
+ *
+ * @method tryResolvePathToURI
+ *
+ * @param {string} path The relative part of the URI
+ * @param {string} documentUrl [OPTIONAL] the full URL where it should be matched against.
+ *
+ * @return {string} The resolved URI (if possible)
+ */
+function tryResolvePathToURI(path, documentUrl){
+
+  if(documentUrl){
+    return (new URL(path, documentUrl)).toString();
+  }
+
+  else{
+    console.warn('Unable to expand ' + path, { id: 'rdfa-helpers.tryResolvePathToURI' } );
+    return path; //TODO: probably we should do better
+  }
+
 }
  */
 function isRelativeUrl(uri) {
