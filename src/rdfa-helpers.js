@@ -213,6 +213,21 @@ function isFullUri(uri) {
  * @param {string} uri A URI
  *
  * @return {boolean} Whether the given URI is a relative URI.
+function isPrefixedUri(uri) {
+  if(isFullUri(uri)){
+    return false;
+  }
+  else if(!uri.includes(':')){
+    return false;
+  }
+  else {
+    //e.g. 'bar:foo' will be split to  'bar:'
+    var potentialPrefix = uri.split(':')[0] + ':';
+    //see https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Definition (defintion of sheme)
+    //see https://en.wikipedia.org/wiki/CURIE
+    return /^\[?[a-z][a-z|\d|\.|\+|\-]*:$/i.test(potentialPrefix);
+  }
+}
  */
 function isRelativeUrl(uri) {
   return uri.startsWith('#') || uri.startsWith('/') || uri.startsWith('./') || uri.startsWith('../');
