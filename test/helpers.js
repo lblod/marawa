@@ -41,4 +41,18 @@ function analyseElement(string, id="wrapperDomElement") {
   return analyse( makeDomElement( string, id ) );
 }
 
-export { makeDom, makeDomElement, analyseElement };
+function tripleAppearsInArray(arrayOfTriples, triple) {
+  for(let i = 0; i < arrayOfTriples.length; i++) {
+    const tripleInArray = arrayOfTriples[i];
+    if(isTripleEqual(tripleInArray, triple)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isTripleEqual(triple1, triple2) {
+  return triple1.subject === triple2.subject && triple1.predicate === triple2.predicate && triple1.object === triple2.object;
+}
+
+export { makeDom, makeDomElement, analyseElement, tripleAppearsInArray };
