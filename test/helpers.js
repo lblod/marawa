@@ -52,6 +52,7 @@ function tripleAppearsInArray(arrayOfTriples, triple) {
 }
 
 function isTripleEqual(triple1, triple2) {
+  if(triple2.datatype && triple1.datatype !== triple2.datatype) return false;
   return triple1.subject === triple2.subject && triple1.predicate === triple2.predicate && triple1.object === triple2.object;
 }
 
