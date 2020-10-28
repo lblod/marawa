@@ -17,16 +17,16 @@ describe( 'Rdfa test suite', function() {
           <p>This photo was taken by <span class="author" about="photo1.jpg" property="dc:creator">Mark Birbeck</span>.</p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('body');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0001.html'});
-    const triples = flatten(blocks.map(b => b.context))
-    assert.strictEqual(triples.length, 1)
+    const triples = flatten(blocks.map(b => b.context));
+    assert.strictEqual(triples.length, 1);
     const [firstTriple] = triples;
-    assert.strictEqual(firstTriple.subject, 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/photo1.jpg')
-    assert.strictEqual(firstTriple.predicate, 'http://purl.org/dc/elements/1.1/creator')
-    assert.strictEqual(firstTriple.object, 'Mark Birbeck')
+    assert.strictEqual(firstTriple.subject, 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/photo1.jpg');
+    assert.strictEqual(firstTriple.predicate, 'http://purl.org/dc/elements/1.1/creator');
+    assert.strictEqual(firstTriple.object, 'Mark Birbeck');
   });
   it( "Test 0006: @rel and @rev", function() {
     const html = `
@@ -43,25 +43,25 @@ describe( 'Rdfa test suite', function() {
           </p>	
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('body');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0006.html'});
-    const triples = flatten(blocks.map(b => b.context))
-    assert.strictEqual(triples.length, 2)
+    const triples = flatten(blocks.map(b => b.context));
+    assert.strictEqual(triples.length, 2);
 
     const firstTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/photo1.jpg',
       predicate: 'http://purl.org/dc/elements/1.1/creator',
       object: 'http://www.blogger.com/profile/1109404'
-    };
+    };;
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://www.blogger.com/profile/1109404',
       predicate: 'http://xmlns.com/foaf/0.1/img',
       object: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/photo1.jpg'
-    }
+    };
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
   });
   it( "Test 0007: @rel, @rev, @property, @content", function() {
@@ -79,32 +79,32 @@ describe( 'Rdfa test suite', function() {
           </p>	
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('body');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0007.html'});
-    const triples = flatten(blocks.map(b => b.context))
+    const triples = flatten(blocks.map(b => b.context));
     assert.strictEqual(triples.length, 3)
 
     const firstTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/photo1.jpg',
       predicate: 'http://purl.org/dc/elements/1.1/title',
       object: 'Portrait of Mark'
-    }
+    };
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/photo1.jpg',
       predicate: 'http://purl.org/dc/elements/1.1/creator',
       object: 'http://www.blogger.com/profile/1109404'
-    }
+    };
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
 
     const thirdTriple = {
       subject: 'http://www.blogger.com/profile/1109404',
       predicate: 'http://xmlns.com/foaf/0.1/img',
       object: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/photo1.jpg'
-    }
+    };
     assert.strictEqual(tripleAppearsInArray(triples, thirdTriple), true);
 
   });
@@ -125,16 +125,16 @@ describe( 'Rdfa test suite', function() {
           </p>	
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('body');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0008.html'});
     const triples = flatten(blocks.map(b => b.context))
-    assert.strictEqual(triples.length, 1)
+    assert.strictEqual(triples.length, 1);
     const [firstTriple] = triples;
-    assert.strictEqual(firstTriple.subject, 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0008.html')
-    assert.strictEqual(firstTriple.predicate, 'http://creativecommons.org/ns#license')
-    assert.strictEqual(firstTriple.object, 'http://creativecommons.org/licenses/by-nc-nd/2.5/')
+    assert.strictEqual(firstTriple.subject, 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0008.html');
+    assert.strictEqual(firstTriple.predicate, 'http://creativecommons.org/ns#license');
+    assert.strictEqual(firstTriple.object, 'http://creativecommons.org/licenses/by-nc-nd/2.5/');
   });
 
   it( "Test 0009: @rev", function() {
@@ -151,16 +151,16 @@ describe( 'Rdfa test suite', function() {
           <p></p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('head');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0009.html'});
-    const triples = flatten(blocks.map(b => b.context))
-    assert.strictEqual(triples.length, 1)
+    const triples = flatten(blocks.map(b => b.context));
+    assert.strictEqual(triples.length, 1);
     const [firstTriple] = triples;
-    assert.strictEqual(firstTriple.subject, 'http://example.org/people#Person2')
-    assert.strictEqual(firstTriple.predicate, 'http://xmlns.com/foaf/0.1/knows')
-    assert.strictEqual(firstTriple.object, 'http://example.org/people#Person1')
+    assert.strictEqual(firstTriple.subject, 'http://example.org/people#Person2');
+    assert.strictEqual(firstTriple.predicate, 'http://xmlns.com/foaf/0.1/knows');
+    assert.strictEqual(firstTriple.object, 'http://example.org/people#Person1');
   });
 
   it( "Test 0010: @rel, @rev, @href", function() {
@@ -176,26 +176,26 @@ describe( 'Rdfa test suite', function() {
           <p></p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0010.html'});
-    const triples = flatten(blocks.map(b => b.context))
-    assert.strictEqual(triples.length, 2)
+    const triples = flatten(blocks.map(b => b.context));
+    assert.strictEqual(triples.length, 2);
     
     const firstTriple = {
       subject: 'http://example.org/people#Person1',
       predicate: 'http://xmlns.com/foaf/0.1/knows',
       object: 'http://example.org/people#Person2'
-    }
-    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
+    };
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://example.org/people#Person2',
       predicate: 'http://xmlns.com/foaf/0.1/knows',
       object: 'http://example.org/people#Person1'
-    }
-    assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true)
+    };
+    assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
   });
 
   it( "Test 0014: @datatype, xsd:integer", function() {
@@ -212,7 +212,7 @@ describe( 'Rdfa test suite', function() {
         </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0014.html'});
@@ -238,25 +238,25 @@ describe( 'Rdfa test suite', function() {
           <p></p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0015.html'});
     const triples = flatten(blocks.map(b => b.context))
-    assert.strictEqual(triples.length, 2)
+    assert.strictEqual(triples.length, 2);
     
     const firstTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0015.html',
       predicate: 'http://purl.org/dc/elements/1.1/creator',
       object: 'Fyodor Dostoevsky'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
 
     const secondTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0015.html',
       predicate: 'http://purl.org/dc/elements/1.1/source',
       object: 'urn:isbn:0140449132'
-    }
+    };
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true)
   });
 
@@ -276,7 +276,7 @@ describe( 'Rdfa test suite', function() {
               </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0017.html'});
@@ -300,7 +300,7 @@ describe( 'Rdfa test suite', function() {
         </p>	 
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0018.html'});
@@ -328,7 +328,7 @@ describe( 'Rdfa test suite', function() {
         </p>	 
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0020.html'});
@@ -356,7 +356,7 @@ describe( 'Rdfa test suite', function() {
           </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0021.html'});
@@ -383,7 +383,7 @@ describe( 'Rdfa test suite', function() {
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0023.html'});
@@ -412,7 +412,7 @@ describe( 'Rdfa test suite', function() {
         </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0025.html'});
@@ -423,14 +423,14 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0025.html',
       predicate: 'http://purl.org/dc/elements/1.1/creator',
       object: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0025.html#me'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
 
     const secondTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0025.html#me',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'Ben Adida'
-    }
+    };
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true)
   });
 
@@ -448,7 +448,7 @@ describe( 'Rdfa test suite', function() {
         </p>	
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0026.html'});
@@ -475,7 +475,7 @@ describe( 'Rdfa test suite', function() {
         </p>	
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0027.html'});
@@ -504,7 +504,7 @@ describe( 'Rdfa test suite', function() {
       
       
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0029.html'});
@@ -534,7 +534,7 @@ describe( 'Rdfa test suite', function() {
           </p>	
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0030.html'});
@@ -561,7 +561,7 @@ describe( 'Rdfa test suite', function() {
           </p>	
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0031.html'});
@@ -589,7 +589,7 @@ describe( 'Rdfa test suite', function() {
           </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0032.html'});
@@ -618,7 +618,7 @@ describe( 'Rdfa test suite', function() {
         </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0033.html'});
@@ -640,7 +640,7 @@ describe( 'Rdfa test suite', function() {
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0034.html'});
@@ -670,7 +670,7 @@ describe( 'Rdfa test suite', function() {
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0036.html'});
@@ -697,7 +697,7 @@ describe( 'Rdfa test suite', function() {
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0038.html'});
@@ -723,7 +723,7 @@ describe( 'Rdfa test suite', function() {
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0048.html'});
@@ -744,7 +744,7 @@ describe( 'Rdfa test suite', function() {
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0049.html'});
@@ -754,14 +754,14 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://www.example.org/#me',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'John Doe'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
 
     const secondTriple = {
       subject: 'http://www.example.org/#me',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Person'
-    }
+    };
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true)
   });
 
@@ -778,7 +778,7 @@ describe( 'Rdfa test suite', function() {
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0050.html'});
@@ -797,7 +797,7 @@ describe( 'Rdfa test suite', function() {
           <p about="" typeof="foaf:Document" property="foaf:topic">John Doe</p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0051.html'});
@@ -808,14 +808,14 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0051.html',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Document'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
 
     const secondTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0051.html',
       predicate: 'http://xmlns.com/foaf/0.1/topic',
       object: 'John Doe'
-    }
+    };
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true)
   });
 
@@ -832,7 +832,7 @@ describe( 'Rdfa test suite', function() {
           </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0052.html'});
@@ -843,7 +843,7 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://www.example.org/#me',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Person'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -860,7 +860,7 @@ describe( 'Rdfa test suite', function() {
           </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0053.html'});
@@ -870,14 +870,14 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://www.example.org/#me',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Person'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
 
     const secondTriple = {
       subject: 'http://www.example.org/#me',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'John Doe'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true)
   });
 
@@ -895,7 +895,7 @@ describe( 'Rdfa test suite', function() {
           </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0054.html'});
@@ -905,14 +905,14 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0054.html',
       predicate: 'http://purl.org/dc/elements/1.1/creator',
       object: 'Fabien Gandon'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
 
     const secondTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0054.html',
       predicate: 'http://purl.org/dc/elements/1.1/publisher',
       object: 'Fabien Gandon'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true)
   });
 
@@ -930,7 +930,7 @@ describe( 'Rdfa test suite', function() {
         </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0055.html'});
@@ -940,14 +940,14 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0055.html',
       predicate: 'http://purl.org/dc/elements/1.1/creator',
       object: 'http://www-sop.inria.fr/acacia/fabien/'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
 
     const secondTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0055.html',
       predicate: 'http://purl.org/dc/elements/1.1/publisher',
       object: 'http://www-sop.inria.fr/acacia/fabien/'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true)
   });
 
@@ -964,7 +964,7 @@ describe( 'Rdfa test suite', function() {
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0056.html'});
@@ -974,21 +974,21 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://www.example.org/#ben',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Person'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
 
     const secondTriple = {
       subject: 'http://www.example.org/#ben',
       predicate: 'http://xmlns.com/foaf/0.1/knows',
       object: 'http://www.example.org/#mark'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true)
 
     const thirdTriple = {
       subject: 'http://www.example.org/#mark',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'Mark Birbeck'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirdTriple), true)
   });
 
@@ -1006,7 +1006,7 @@ describe( 'Rdfa test suite', function() {
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0057.html'});
@@ -1016,28 +1016,28 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://www.example.org/#ben',
       predicate: 'http://xmlns.com/foaf/0.1/knows',
       object: 'http://www.example.org/#mark'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
 
     const secondTriple = {
       subject: 'http://www.example.org/#ben',
       predicate: 'http://xmlns.com/foaf/0.1/knows',
       object: 'http://www.example.org/#ivan'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true)
 
     const thirdTriple = {
       subject: 'http://www.example.org/#mark',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'Mark Birbeck'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirdTriple), true)
 
     const fourthTriple = {
       subject: 'http://www.example.org/#ivan',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'Ivan Herman'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, fourthTriple), true)
   });
 
@@ -1056,7 +1056,7 @@ describe( 'Rdfa test suite', function() {
           </ul>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0059.html'});
@@ -1066,42 +1066,42 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0059.html',
       predicate: 'http://purl.org/dc/elements/1.1/creator',
       object: 'http://www.example.org/#manu'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
 
     const secondTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0059.html',
       predicate: 'http://purl.org/dc/elements/1.1/publisher',
       object: 'hhttp://www.example.org/#manu'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true)
 
     const thirdTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0059.html',
       predicate: 'http://purl.org/dc/elements/1.1/creator',
       object: 'http://www.example.org/#fabien'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirdTriple), true)
 
     const fourthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0059.html',
       predicate: 'http://purl.org/dc/elements/1.1/publisher',
       object: 'http://www.example.org/#fabien'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, fourthTriple), true)
 
     const fifthTriple = {
       subject: 'http://www.example.org/#manu',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'Manu Sporny'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, fifthTriple), true)
 
     const sixthTriple = {
       subject: 'http://www.example.org/#fabien',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'Fabien Gandon'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, sixthTriple), true)
   });
 
@@ -1119,7 +1119,7 @@ describe( 'Rdfa test suite', function() {
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0060.html'});
@@ -1129,14 +1129,14 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://www.example.org/#matsumoto-kimiko',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Person'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
 
     const secondTriple = {
       subject: 'http://www.example.org/#matsumoto-kimiko',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: '松本 后子'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true)
   });
 
@@ -1152,7 +1152,7 @@ describe( 'Rdfa test suite', function() {
             <p>This is the 63<sup>rd</sup> test. The next test is #64.</p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0063.html'});
@@ -1162,7 +1162,7 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0063.html',
       predicate: 'http://www.w3.org/1999/xhtml/vocab#next',
       object: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0064.html'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -1179,7 +1179,7 @@ describe( 'Rdfa test suite', function() {
           </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0064.html'});
@@ -1207,7 +1207,7 @@ describe( 'Rdfa test suite', function() {
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0065.html'});
@@ -1226,7 +1226,7 @@ describe( 'Rdfa test suite', function() {
             <p>This is test #66.</p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0066.html'});
@@ -1236,7 +1236,7 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0066.html',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Document'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -1251,7 +1251,7 @@ describe( 'Rdfa test suite', function() {
             <p>This is test #67.</p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0067.html'});
@@ -1261,7 +1261,7 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0067.html',
       predicate: 'http://xmlns.com/foaf/0.1/topic',
       object: 'Test 0067'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -1279,7 +1279,7 @@ describe( 'Rdfa test suite', function() {
             </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0068.html'});
@@ -1289,7 +1289,7 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0067.html',
       predicate: 'http://purl.org/dc/elements/1.1/title',
       object: 'Test 0067'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -1306,7 +1306,7 @@ describe( 'Rdfa test suite', function() {
             </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0069.html'});
@@ -1316,7 +1316,7 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0069.html',
       predicate: 'http://www.w3.org/1999/xhtml/vocab#next',
       object: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0070.html'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -1333,7 +1333,7 @@ describe( 'Rdfa test suite', function() {
             </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0070.html'});
@@ -1343,7 +1343,7 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0070.html',
       predicate: 'http://www.w3.org/1999/xhtml/vocab#prev',
       object: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0069.html'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -1362,7 +1362,7 @@ describe( 'Rdfa test suite', function() {
             </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0071.html'});
@@ -1372,7 +1372,7 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0071.html',
       predicate: 'http://creativecommons.org/ns#license',
       object: 'http://creativecommons.org/licenses/by-nd/3.0/'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -1391,7 +1391,7 @@ describe( 'Rdfa test suite', function() {
             </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0072.html'});
@@ -1401,7 +1401,7 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://www.example.org/faq',
       predicate: 'http://purl.org/dc/elements/1.1/title',
       object: 'Example FAQ'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -1420,7 +1420,7 @@ describe( 'Rdfa test suite', function() {
             </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0073.html'});
@@ -1430,7 +1430,7 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://www.example.org/',
       predicate: 'http://purl.org/dc/elements/1.1/creator',
       object: 'http://www.example.org/jane'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -1449,7 +1449,7 @@ describe( 'Rdfa test suite', function() {
         </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0074.html'});
@@ -1460,7 +1460,7 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://www.example.org/',
       predicate: 'http://purl.org/dc/elements/1.1/creator',
       object: 'http://www.example.org/jane'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -1479,7 +1479,7 @@ describe( 'Rdfa test suite', function() {
         </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0074.html'});
@@ -1489,7 +1489,7 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://www.example.org/',
       predicate: 'http://purl.org/dc/elements/1.1/creator',
       object: 'http://www.example.org/jane'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -1508,7 +1508,7 @@ describe( 'Rdfa test suite', function() {
           </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0075.html'});
@@ -1518,7 +1518,7 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://www.example.org/',
       predicate: 'http://www.w3.org/1999/xhtml/vocab#license',
       object: 'http://www.example.org/jane'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -1535,7 +1535,7 @@ describe( 'Rdfa test suite', function() {
         </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0080.html'});
@@ -1545,7 +1545,7 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://www.example.org/#somebody',
       predicate: 'http://xmlns.com/foaf/0.1/knows',
       object: 'http://danbri.org/foaf.rdf#danbri'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -1564,7 +1564,7 @@ describe( 'Rdfa test suite', function() {
         </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0083.html'});
@@ -1590,7 +1590,7 @@ describe( 'Rdfa test suite', function() {
         </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0084.html'});
@@ -1612,7 +1612,7 @@ describe( 'Rdfa test suite', function() {
         </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0088.html'});
@@ -1633,7 +1633,7 @@ describe( 'Rdfa test suite', function() {
             </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0089.html'});
@@ -1644,7 +1644,7 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://example.org/example.png',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Image'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -1665,7 +1665,7 @@ describe( 'Rdfa test suite', function() {
             </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0091.html'});
@@ -1687,7 +1687,7 @@ describe( 'Rdfa test suite', function() {
         </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0093.html'});
@@ -1697,7 +1697,7 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0093.html',
       predicate: 'http://purl.org/dc/elements/1.1/creator',
       object: 'Albert Einstein'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
 
     const secondTriple = {
@@ -1705,7 +1705,7 @@ describe( 'Rdfa test suite', function() {
       predicate: 'http://purl.org/dc/elements/1.1/title',
       object: 'E = mc2: The Most Urgent Problem of Our Time',
       datatype: 'http://www.example.org/XMLLiteral'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true)
   });
 
@@ -1729,7 +1729,7 @@ describe( 'Rdfa test suite', function() {
           Lao Tzu: Tao Te Ching</p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0099.html'});
@@ -1739,7 +1739,7 @@ describe( 'Rdfa test suite', function() {
       subject: 'http://www.cwi.nl/~steven/',
       predicate: 'http://www.example.org/likes',
       object: `\n          We put thirty spokes together and call it a wheel;\n          But it is on the space where there is nothing that the usefulness of the wheel depends.\n          We turn clay to make a vessel;\n          But it is on the space where there is nothing that the usefulness of the vessel depends.\n          We pierce doors and windows to make a house;\n          And it is on these spaces where there is nothing that the usefulness of the house depends.\n          Therefore just as we take advantage of what is, we should recognize the usefulness of what is not.\n      \n          Lao Tzu: Tao Te Ching`
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -1760,7 +1760,7 @@ describe( 'Rdfa test suite', function() {
         </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0104.html'});
@@ -1781,7 +1781,7 @@ describe( 'Rdfa test suite', function() {
             </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0106.html'});
@@ -1800,7 +1800,7 @@ describe( 'Rdfa test suite', function() {
             <div rel="next"></div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0107.html'});
@@ -1821,7 +1821,7 @@ describe( 'Rdfa test suite', function() {
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0110.html'});
@@ -1844,7 +1844,7 @@ describe( 'Rdfa test suite', function() {
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0111.html'});
@@ -1868,7 +1868,7 @@ whitespace     preserved
           </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0112.html'});
@@ -1878,7 +1878,7 @@ whitespace     preserved
       subject: 'http://example.org/node',
       predicate: 'http://example.org/property',
       object: 'not an XML Literal,\nwhitespace     preserved\n'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -1899,7 +1899,7 @@ whitespace     preserved
             </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0115.html'});
@@ -1909,28 +1909,28 @@ whitespace     preserved
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0115.html',
       predicate: 'http://www.example.com/entity1',
       object: '>'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
 
     const secondTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0115.html',
       predicate: 'http://www.example.com/entity2',
       object: 'Ben & Co.'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true)
 
     const thirdTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0115.html',
       predicate: 'http://www.example.com/entity3',
       object: '@'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirdTriple), true)
 
     const fourthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0115.html',
       predicate: 'http://www.example.com/entity4',
       object: '@'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, fourthTriple), true)
   });
 
@@ -1949,7 +1949,7 @@ whitespace     preserved
             </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0117.html'});
@@ -1959,14 +1959,14 @@ whitespace     preserved
       subject: 'http://www.example.org/tc117.xhtml',
       predicate: 'http://purl.org/dc/elements/1.1/title',
       object: 'Test 0117'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
 
     const secondTriple = {
       subject: 'http://www.example.org/tc117.xhtml',
       predicate: 'http://purl.org/dc/elements/1.1/contributor',
       object: 'Mark Birbeck'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true)
 
   });
@@ -1988,7 +1988,7 @@ whitespace     preserved
         </body>
       
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0118.html'});
@@ -1998,7 +1998,7 @@ whitespace     preserved
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0118.html',
       predicate: 'http://purl.org/dc/elements/1.1/creator',
       object: 'Ben'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
 
 
@@ -2022,7 +2022,7 @@ whitespace     preserved
         </body>
       
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0119.html'});
@@ -2032,7 +2032,7 @@ whitespace     preserved
       subject: 'http://example.org/',
       predicate: 'http://purl.org/dc/elements/1.1/title',
       object: 'Example Website'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
 
 
@@ -2053,7 +2053,7 @@ whitespace     preserved
               </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0119.html'});
@@ -2063,7 +2063,7 @@ whitespace     preserved
       subject: 'http://www.w3.org/1999/xhtml/vocab#',
       predicate: 'http://purl.org/dc/elements/1.1/title',
       object: 'The XHTML Vocabulary Document'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -2080,7 +2080,7 @@ whitespace     preserved
             </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0119.html'});
@@ -2102,7 +2102,7 @@ whitespace     preserved
             </div>
           </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0119.html'});
@@ -2112,21 +2112,21 @@ whitespace     preserved
       subject: 'http://www.example.org/#article',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Document'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
 
     const secondTriple = {
       subject: 'http://www.example.org/#article',
       predicate: 'a',
       object: 'http://rdfs.org/sioc/ns#Post'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true)
 
     const thirdTriple = {
       subject: 'http://www.example.org/#article',
       predicate: 'http://purl.org/dc/terms/title',
       object: 'My article'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirdTriple), true)
   });
 
@@ -2141,7 +2141,7 @@ whitespace     preserved
       <body>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0134.html'});
@@ -2151,7 +2151,7 @@ whitespace     preserved
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0134.html',
       predicate: 'http://www.w3.org/1999/xhtml/vocab#license',
       object: 'http://example.org/test.css'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -2167,7 +2167,7 @@ whitespace     preserved
       <p property="_:invalid">Test</p>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0140.html'});
@@ -2191,7 +2191,7 @@ whitespace     preserved
       </body>
       
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0174.html'});
@@ -2201,7 +2201,7 @@ whitespace     preserved
       subject: 'http://example.org/jd',
       predicate: 'http://www.w3.org/2006/vcard/ns#fn',
       object: 'John Doe'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -2218,7 +2218,7 @@ whitespace     preserved
           </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0175.html'});
@@ -2247,7 +2247,7 @@ whitespace     preserved
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0176.html'});
@@ -2269,7 +2269,7 @@ whitespace     preserved
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0177.html'});
@@ -2279,7 +2279,7 @@ whitespace     preserved
       subject: 'http://example.org/#me',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'Ivan Herman'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -2297,7 +2297,7 @@ whitespace     preserved
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0178.html'});
@@ -2307,14 +2307,14 @@ whitespace     preserved
       subject: 'http://example.org/#this',
       predicate: 'a',
       object: 'http://purl.org/dc/terms/Agent'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
 
     const secondTriple = {
       subject: 'http://example.org/#this',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'A particular agent'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true)
   });
 
@@ -2331,7 +2331,7 @@ whitespace     preserved
         </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0181.html'});
@@ -2341,7 +2341,7 @@ whitespace     preserved
       subject: 'http://www.example.org/software',
       predicate: 'http://www.w3.org/1999/xhtml/vocab#license',
       object: 'http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
   });
 
@@ -2361,7 +2361,7 @@ whitespace     preserved
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0182.html'});
@@ -2371,14 +2371,14 @@ whitespace     preserved
       subject: 'http://example.org/#this',
       predicate: 'a',
       object: 'http://purl.org/dc/terms/Agent'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://example.org/#this',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'A particular agent'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
   });
 
@@ -2396,7 +2396,7 @@ whitespace     preserved
         </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0182.html'});
@@ -2406,7 +2406,7 @@ whitespace     preserved
       subject: 'http://example.org/#me',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'Ivan Herman'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -2426,7 +2426,7 @@ whitespace     preserved
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0187.html'});
@@ -2436,7 +2436,7 @@ whitespace     preserved
       subject: 'http://example.org/#me',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'Ivan Herman'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -2456,7 +2456,7 @@ whitespace     preserved
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0188.html'});
@@ -2466,7 +2466,7 @@ whitespace     preserved
       subject: 'http://example.org/#me',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'Ivan Herman'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -2483,7 +2483,7 @@ whitespace     preserved
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0189.html'});
@@ -2493,7 +2493,7 @@ whitespace     preserved
       subject: 'http://www.example.org/software',
       predicate: 'http://www.example.org/vocab#license',
       object: 'http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -2510,7 +2510,7 @@ whitespace     preserved
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0190.html'});
@@ -2521,7 +2521,7 @@ whitespace     preserved
       subject: 'http://www.example.org/software',
       predicate: 'http://www.w3.org/1999/xhtml/vocab#license',
       object: 'http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -2539,7 +2539,7 @@ whitespace     preserved
       </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0196.html'});
@@ -2550,14 +2550,14 @@ whitespace     preserved
       predicate: 'http://example.org/rdf/xmllit',
       object: 'This is an XMLLiteral',
       datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://www.example.org',
       predicate: 'http://example.org/rdf/plainlit',
       object: 'This is a plain literal'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
   });
 
@@ -2576,7 +2576,7 @@ whitespace     preserved
         <p rev="pred/rev" resource="http://github.org/gkellogg/rdf_context">Ruby Gem</p>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0197.html'});
@@ -2586,7 +2586,7 @@ whitespace     preserved
       subject: 'http://www.example.org/me',
       predicate: 'http://purl.org/dc/terms/language',
       object: 'Ruby'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
   });
@@ -2605,7 +2605,7 @@ whitespace     preserved
       </body>
       
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0206.html'});
@@ -2615,7 +2615,7 @@ whitespace     preserved
       subject: 'http://www.w3.org/2001/XMLSchema#maxExclusive',
       predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
       object: 'http://www.w3.org/2002/07/owl#DatatypeProperty'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
   });
@@ -2637,7 +2637,7 @@ whitespace     preserved
         </p>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0207.html'});
@@ -2647,14 +2647,14 @@ whitespace     preserved
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0207.html#event1',
       predicate: 'a',
       object: 'http://www.w3.org/2002/12/cal/icaltzd#Vevent'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0207.html#event1',
       predicate: 'http://www.w3.org/2002/12/cal/icaltzd#summary',
       object: 'Weekend off in Iona'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
 
     const thirdTriple = {
@@ -2662,7 +2662,7 @@ whitespace     preserved
       predicate: 'http://www.w3.org/2002/12/cal/icaltzd#dtstart',
       object: '2006-10-21',
       datatype: 'http://www.w3.org/2001/XMLSchema#date'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirdTriple), true);
 
     const fourthTriple = {
@@ -2670,21 +2670,21 @@ whitespace     preserved
       predicate: 'http://www.w3.org/2002/12/cal/icaltzd#dtend',
       object: '2006-10-23',
       datatype: 'http://www.w3.org/2001/XMLSchema#date'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, fourthTriple), true);
 
     const fifthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0207.html#event1',
       predicate: 'http://www.w3.org/2002/12/cal/icaltzd#url',
       object: 'http://freetime.example.org/'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, fifthTriple), true);
 
     const sixthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0207.html#event1',
       predicate: 'http://www.w3.org/2002/12/cal/icaltzd#location',
       object: 'Iona, UK'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, sixthTriple), true);
 
   });
@@ -2704,7 +2704,7 @@ whitespace     preserved
         </body>
       
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0213.html'});
@@ -2714,7 +2714,7 @@ whitespace     preserved
       subject: 'http://www.example.org/',
       predicate: 'http://purl.org/dc/elements/1.1/title',
       object: 'E = mc2: The Most Urgent Problem of Our Time'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
   });
@@ -2730,7 +2730,7 @@ whitespace     preserved
         <p>This document has a title.</p>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0214.html'});
@@ -2740,14 +2740,14 @@ whitespace     preserved
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0214.html',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Document'
-    };
+    };;
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0214.html',
       predicate: 'http://purl.org/dc/terms/title',
       object: 'Test 0214'
-    };
+    };;
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
 
   });
@@ -2785,7 +2785,7 @@ whitespace     preserved
           <p about="http://www.ivan-herman.net/foaf#me" property="foaf:name">Iván</p>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0216.html'});
@@ -2795,7 +2795,7 @@ whitespace     preserved
       subject: 'http://www.ivan-herman.net/foaf#me',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'Iván'
-    };
+    };;
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -2813,7 +2813,7 @@ whitespace     preserved
         </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0217.html'});
@@ -2823,14 +2823,14 @@ whitespace     preserved
       subject: 'http://example.org/#me',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'Gregg Kellogg'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://example.org/',
       predicate: 'http://www.w3.org/ns/rdfa#usesVocabulary',
       object: 'http://xmlns.com/foaf/0.1/'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
 
   });
@@ -2854,7 +2854,7 @@ whitespace     preserved
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0228.html'});
@@ -2864,7 +2864,7 @@ whitespace     preserved
       subject: 'http://sw-app.org/img/mic_2006_03.jpg',
       predicate: 'http://www.w3.org/1999/xhtml/vocab#alternate',
       object: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0228.html'
-    };
+    };;
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -2883,7 +2883,7 @@ whitespace     preserved
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0229.html'});
@@ -2893,7 +2893,7 @@ whitespace     preserved
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0229.html',
       predicate: 'http://xmlns.com/foaf/0.1/img',
       object: 'http://sw-app.org/img/mic_2007_01.jpg'
-    };
+    };;
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -2910,7 +2910,7 @@ whitespace     preserved
         </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0231.html'});
@@ -2920,7 +2920,7 @@ whitespace     preserved
       subject: 'http://example.org/example.png',
       predicate: 'http://www.w3.org/1999/xhtml/vocab#license',
       object: 'http://creativecommons.org/licenses/by-nc-sa/2.0/'
-    };
+    };;
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -2937,7 +2937,7 @@ whitespace     preserved
         </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0231.html'});
@@ -2947,7 +2947,7 @@ whitespace     preserved
       subject: 'http://example.org/example.png',
       predicate: 'http://www.w3.org/1999/xhtml/vocab#license',
       object: 'http://creativecommons.org/licenses/by-nc-sa/2.0/'
-    };
+    };;
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -2964,7 +2964,7 @@ whitespace     preserved
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0232.html'});
@@ -2985,7 +2985,7 @@ whitespace     preserved
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0233.html'});
@@ -3007,7 +3007,7 @@ whitespace     preserved
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0246.html'});
@@ -3030,7 +3030,7 @@ whitespace     preserved
         </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0247.html'});
@@ -3053,7 +3053,7 @@ whitespace     preserved
         </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0248.html'});
@@ -3076,7 +3076,7 @@ whitespace     preserved
         </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0249.html'});
@@ -3095,7 +3095,7 @@ whitespace     preserved
         <p about ="http://www.ivan-herman.net/foaf#me" typeof="foaf:Person" property="foaf:name">Ivan Herman</p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0250.html'});
@@ -3105,14 +3105,14 @@ whitespace     preserved
       subject: 'http://www.ivan-herman.net/foaf#me',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Person'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://www.ivan-herman.net/foaf#me',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'Ivan Herman'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
   });
 
@@ -3128,7 +3128,7 @@ whitespace     preserved
           <p></p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0251.html'});
@@ -3139,7 +3139,7 @@ whitespace     preserved
       predicate: 'http://example.org/property',
       object: 'chat',
       language: 'fr'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -3155,7 +3155,7 @@ whitespace     preserved
           <p></p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0247.html'});
@@ -3166,7 +3166,7 @@ whitespace     preserved
       predicate: 'http://example.org/property',
       object: 'chat',
       language: 'fr'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -3184,7 +3184,7 @@ whitespace     preserved
       </p>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0253.html'});
@@ -3195,7 +3195,7 @@ whitespace     preserved
       predicate: 'http://example.org/property',
       object: 'ελληνικό\nάσπρο   διάστημα\n',
       language: 'el'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -3211,7 +3211,7 @@ whitespace     preserved
         <p property="ex:prop" datatype="">A <strong>plain literal</strong> with a lang tag.</p> 
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0254.html'});
@@ -3222,7 +3222,7 @@ whitespace     preserved
       predicate: 'http://example.org/terms#prop',
       object: 'A plain literal with a lang tag.',
       language: 'en'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -3238,7 +3238,7 @@ whitespace     preserved
         <p property="ex:prop" lang="">Just a plain literal.</p> 
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0255.html'});
@@ -3249,7 +3249,7 @@ whitespace     preserved
       predicate: 'http://example.org/terms#prop',
       object: 'Just a plain literal.',
       language: ''
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -3264,7 +3264,7 @@ whitespace     preserved
           <span about="#a" property="dc:title"></span>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0257.html'});
@@ -3274,7 +3274,7 @@ whitespace     preserved
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0257.html#a',
       predicate: 'http://purl.org/dc/elements/1.1/title',
       object: '',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -3335,7 +3335,7 @@ whitespace     preserved
         </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html'});
@@ -3345,273 +3345,273 @@ whitespace     preserved
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/ns/csvw#',
       object: 'CSVW',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/ns/dcat#',
       object: 'DCAT',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
 
     const thirdTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://purl.org/linked-data/cube#',
       object: 'QB',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirdTriple), true);
 
     const fourthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/2003/g/data-view#',
       object: 'GRDDL',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, fourthTriple), true);
 
     const fifthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/ns/ma-ont#',
       object: 'MA',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, fifthTriple), true);
 
     const sixthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/ns/org#',
       object: 'ORG',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, sixthTriple), true);
 
     const seventhTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/2002/07/owl#',
       object: 'OWL',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, seventhTriple), true);
 
     const eightTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/ns/prov#',
       object: 'PROV',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, eightTriple), true);
 
     const ninethTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
       object: 'RDF',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, ninethTriple), true);
 
     const tenthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/ns/rdfa#',
       object: 'RDFa',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, tenthTriple), true);
 
     const eleventhTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/2000/01/rdf-schema#',
       object: 'RDFS',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, eleventhTriple), true);
 
     const twelvethTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/2007/rif#',
       object: 'RIF',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, twelvethTriple), true);
 
     const thirteenthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/ns/r2rml#',
       object: 'RR',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirteenthTriple), true);
 
     const fourteenthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/ns/sparql-service-description#',
       object: 'SD',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, fourteenthTriple), true);
 
     const fifteenthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/2004/02/skos/core#',
       object: 'SKOS',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, fifteenthTriple), true);
 
     const sixteenthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/2008/05/skos-xl#',
       object: 'SKOS-XL',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, sixteenthTriple), true);
 
     const seventeenthtriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/2007/05/powder#',
       object: 'WDR',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, seventeenthtriple), true);
 
     const eightteenthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://rdfs.org/ns/void#',
       object: 'VOID',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, eightteenthTriple), true);
 
     const nineteenthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/2007/05/powder-s#',
       object: 'WDRS',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, nineteenthTriple), true);
 
     const twentythTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/1999/xhtml/vocab#',
       object: 'XHV',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, twentythTriple), true);
 
     const twentyfirstTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/XML/1998/namespace',
       object: 'XML',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, twentyfirstTriple), true);
 
     const twentysecondTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/2001/XMLSchema#',
       object: 'XSD',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, twentysecondTriple), true);
 
     const twentythirdTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://creativecommons.org/ns#',
       object: 'CC',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, twentythirdTriple), true);
 
     const twentyfourthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://commontag.org/ns#',
       object: 'CTAG',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, twentyfourthTriple), true);
 
     const twentyfifthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://commontag.org/ns#',
       object: 'CTAG',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, twentyfifthTriple), true);
 
     const twentysixthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://purl.org/dc/terms/',
       object: 'DC',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, twentysixthTriple), true);
 
     const twentyseventhTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://purl.org/dc/terms/',
       object: 'DCTERMS',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, twentyseventhTriple), true);
 
     const twentyeigthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://xmlns.com/foaf/0.1/',
       object: 'FOAF',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, twentyeigthTriple), true);
 
     const twentyninethTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://purl.org/goodrelations/v1#',
       object: 'GR',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, twentyninethTriple), true);
 
     const thirtythTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/2002/12/cal/icaltzd#',
       object: 'ICAL',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirtythTriple), true);
 
     const thirtyfirstTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://ogp.me/ns#',
       object: 'OG',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirtyfirstTriple), true);
 
     const thirtysecondTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://purl.org/stuff/rev#',
       object: 'REV',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirtysecondTriple), true);
 
     const thirtythirdTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://rdfs.org/sioc/ns#',
       object: 'SIOC',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirtythirdTriple), true);
 
     const thirtyfourthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://rdf.data-vocabulary.org/#',
       object: 'V',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirtyfourthTriple), true);
 
     const thirtyfifthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/2006/vcard/ns#',
       object: 'VCARD',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirtyfifthTriple), true);
 
     const thirtysixthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://schema.org/',
       object: 'Schema',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirtysixthTriple), true);
 
     const thirtySeventhTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/2007/05/powder-s#describedby',
       object: 'DescribedBy',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirtySeventhTriple), true);
 
     const thirtyEightthTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/1999/xhtml/vocab#license',
       object: 'License',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirtyEightthTriple), true);
 
     const thirtyNinethTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
       predicate: 'http://www.w3.org/1999/xhtml/vocab#role',
       object: 'Role',
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirtyNinethTriple), true);
   });
 
@@ -3629,7 +3629,7 @@ whitespace     preserved
       </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0257.html'});
@@ -3640,7 +3640,7 @@ whitespace     preserved
       predicate: 'http://example.org/rdf/xmllit',
       object: 'This is\n      an XMLLiteral',
       datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -3656,7 +3656,7 @@ whitespace     preserved
       ">Mark Birbeck</span>.</p>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0262.html'});
@@ -3666,7 +3666,7 @@ whitespace     preserved
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/photo1.jpg',
       predicate: 'http://purl.org/dc/elements/1.1/creator',
       object: 'Mark Birbeck'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -3681,7 +3681,7 @@ whitespace     preserved
         <p> </p>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0263.html'});
@@ -3691,7 +3691,7 @@ whitespace     preserved
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0263.html',
       predicate: 'http://www.w3.org/2000/01/rdf-schema#seeAlso',
       object: 'http://www.example.org'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -3706,7 +3706,7 @@ whitespace     preserved
         <p> </p>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0264.html'});
@@ -3716,7 +3716,7 @@ whitespace     preserved
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0264.html',
       predicate: 'http://www.w3.org/2000/01/rdf-schema#seeAlso',
       object: 'http://www.example.org'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -3731,7 +3731,7 @@ whitespace     preserved
         <p> </p>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0265.html'});
@@ -3741,7 +3741,7 @@ whitespace     preserved
       subject: 'http://www.example.com',
       predicate: 'http://www.w3.org/2000/01/rdf-schema#seeAlso',
       object: 'http://www.example.org'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -3758,7 +3758,7 @@ whitespace     preserved
         </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0266.html'});
@@ -3768,14 +3768,14 @@ whitespace     preserved
       subject: 'http://www.w3.org/Person/Ivan#me',
       predicate: 'http://www.w3.org/2002/07/owl#sameAs',
       object: 'http://www.ivan-herman.net/foaf#me'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://www.ivan-herman.net/foaf#me',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Person'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
   });
 
@@ -3792,7 +3792,7 @@ whitespace     preserved
         </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0267.html'});
@@ -3802,14 +3802,14 @@ whitespace     preserved
       subject: 'http://www.w3.org/Person/Ivan#me',
       predicate: 'http://www.w3.org/2002/07/owl#sameAs',
       object: 'http://www.ivan-herman.net/foaf#me'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://www.ivan-herman.net/foaf#me',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Person'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
   });
 
@@ -3826,7 +3826,7 @@ whitespace     preserved
         </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0268.html'});
@@ -3836,14 +3836,14 @@ whitespace     preserved
       subject: 'http://www.ivan-herman.net/foaf#me',
       predicate: 'http://xmlns.com/foaf/0.1/depiction',
       object: 'http://www.ivan-herman.net/Images/me2003-small.png'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://www.ivan-herman.net/Images/me2003-small.png',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Image'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
   });
 
@@ -3858,7 +3858,7 @@ whitespace     preserved
         <p> </p>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0269.html'});
@@ -3868,7 +3868,7 @@ whitespace     preserved
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0269.html',
       predicate: 'http://www.w3.org/2000/01/rdf-schema#comment',
       object: 'This is an RDFa test'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -3883,7 +3883,7 @@ whitespace     preserved
       <p> </p>
     </body>
     </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0271.html'});
@@ -3893,7 +3893,7 @@ whitespace     preserved
       subject: 'http://www.example.org/',
       predicate: 'http://www.w3.org/2000/01/rdf-schema#comment',
       object: 'This is an RDFa test'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -3908,7 +3908,7 @@ whitespace     preserved
         <time property="rdf:value" datetime="2012-03-18">18 March 2012</time>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0272.html'});
@@ -3927,7 +3927,7 @@ whitespace     preserved
         <time property="rdf:value" datetime="00:00:00">midnight</time>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0273.html'});
@@ -3946,7 +3946,7 @@ whitespace     preserved
         <time property="rdf:value" datetime="2012-03-18T00:00:00Z">18 March 2012 at midnight</time>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0274.html'});
@@ -3965,7 +3965,7 @@ whitespace     preserved
         <time property="rdf:value">2012-03-18</time>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0275.html'});
@@ -3984,7 +3984,7 @@ whitespace     preserved
         <time property="rdf:value">00:00:00</time>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0276.html'});
@@ -4003,7 +4003,7 @@ whitespace     preserved
         <time property="rdf:value">2012-03-18T00:00:00Z</time>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0277.html'});
@@ -4023,7 +4023,7 @@ whitespace     preserved
         <time property="rdf:value" datetime="2012-03-18" content="this should be the value">18 March 2012</time>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0278.html'});
@@ -4042,7 +4042,7 @@ whitespace     preserved
         <time property="rdf:value" datetime="2012-03-18T00:00:00Z" datatype="xsd:date">18 March 2012 at midnight</time>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0279.html'});
@@ -4053,7 +4053,7 @@ whitespace     preserved
       predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value',
       object: '2012-03-18T00:00:00Z',
       datatype: 'http://www.w3.org/2001/XMLSchema#date'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -4068,7 +4068,7 @@ whitespace     preserved
         <time property="rdf:value" datetime="2012">Two Thousand Twelve</time>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0281.html'});
@@ -4079,7 +4079,7 @@ whitespace     preserved
       predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value',
       object: '2012',
       datatype: 'http://www.w3.org/2001/XMLSchema#gYear'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -4094,7 +4094,7 @@ whitespace     preserved
         <time property="rdf:value" datetime="2012-03">March, Two Thousand Twelve</time>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0282.html'});
@@ -4105,7 +4105,7 @@ whitespace     preserved
       predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value',
       object: '2012-03',
       datatype: 'http://www.w3.org/2001/XMLSchema#gYearMonth'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -4120,7 +4120,7 @@ whitespace     preserved
         <time property="rdf:value"> 2012-03-18</time>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0282.html'});
@@ -4139,7 +4139,7 @@ whitespace     preserved
         <time property="rdf:value" datatype="xsd:dateTime"> 2012-03-18</time>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0284.html'});
@@ -4150,7 +4150,7 @@ whitespace     preserved
       predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value',
       object: ' 2012-03-18',
       datatype: 'http://www.w3.org/2001/XMLSchema#dateTime'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -4165,7 +4165,7 @@ whitespace     preserved
         <time property="rdf:value" datetime="2012-03-18T00:00:00-08:00">18 March 2012 at midnight in San Francisco</time>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0287.html'});
@@ -4185,7 +4185,7 @@ whitespace     preserved
         <a href="http://example.org/" property="rdf:value" content="value">ignored</a>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0289.html'});
@@ -4195,7 +4195,7 @@ whitespace     preserved
       subject: 'http://example.org/',
       predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value',
       object: 'value'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -4211,7 +4211,7 @@ whitespace     preserved
         <a href="http://example.org/" property="rdf:value" datatype="">value</a>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0290.html'});
@@ -4221,7 +4221,7 @@ whitespace     preserved
       subject: 'http://example.org/',
       predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value',
       object: 'value'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -4237,7 +4237,7 @@ whitespace     preserved
         <a about="http://example.net/" href="http://example.org/" property="rdf:value" content="value">ignored</a>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0291.html'});
@@ -4247,7 +4247,7 @@ whitespace     preserved
       subject: 'http://example.net/',
       predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value',
       object: 'value'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -4265,7 +4265,7 @@ whitespace     preserved
         </a>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0292.html'});
@@ -4275,14 +4275,14 @@ whitespace     preserved
       subject: 'http://example.net/',
       predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value',
       object: 'value one'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://example.net/',
       predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value',
       object: 'value two'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
   });
 
@@ -4300,7 +4300,7 @@ whitespace     preserved
         </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0293.html'});
@@ -4310,7 +4310,7 @@ whitespace     preserved
       subject: 'http://www.example.org',
       predicate: 'http://www.example.org/column:test',
       object: 'Test'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -4342,7 +4342,7 @@ whitespace     preserved
         </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0296.html'});
@@ -4352,98 +4352,98 @@ whitespace     preserved
       subject: 'http://example.com/gregg/#me',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Person'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://example.com/niklas/#me',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Person'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
 
     const thirdTriple = {
       subject: 'http://example.com/stéphane/#me',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Person'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirdTriple), true);
 
     const fourthTriple = {
       subject: 'http://example.com/ivan/#me',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Person'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, fourthTriple), true);
 
     const fifthTriple = {
       subject: 'http://example.com/manu/#me',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Person'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, fifthTriple), true);
 
     const sixthTriple = {
       subject: 'http://example.com/gregg/#me',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'Gregg'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, sixthTriple), true);
 
     const seventhTriple = {
       subject: 'http://example.com/niklas/#me',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'Niklas'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, seventhTriple), true);
 
     const eightTriple = {
       subject: 'http://example.com/stéphane/#me',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'Stéphane'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, eightTriple), true);
 
     const ninethTriple = {
       subject: 'http://example.com/ivan/#me',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'Ivan'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, ninethTriple), true);
 
     const tenthTriple = {
       subject: 'http://example.com/manu/#me',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'Manu'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, tenthTriple), true);
 
     const eleventhTriple = {
       subject: 'http://example.com/gregg/#me',
       predicate: 'http://xmlns.com/foaf/0.1/knows',
       object: 'http://example.com/niklas/#me'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, eleventhTriple), true);
 
     const twelvethTriple = {
       subject: 'http://example.com/gregg/#me',
       predicate: 'http://xmlns.com/foaf/0.1/knows',
       object: 'http://example.com/stéphane/#me'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, twelvethTriple), true);
 
     const thirteenthTriple = {
       subject: 'http://example.com/gregg/#me',
       predicate: 'http://xmlns.com/foaf/0.1/knows',
       object: 'http://example.com/ivan/#me'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirteenthTriple), true);
 
     const fourteenthTriple = {
       subject: 'http://example.com/gregg/#me',
       predicate: 'http://xmlns.com/foaf/0.1/knows',
       object: 'http://example.com/manu/#me'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, fourteenthTriple), true);
   });
 
@@ -4458,7 +4458,7 @@ whitespace     preserved
         <div about="[]" typeof="foaf:Person" property="foaf:name">Alex Milowski</div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0297.html'});
@@ -4479,7 +4479,7 @@ whitespace     preserved
         </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0298.html'});
@@ -4498,7 +4498,7 @@ whitespace     preserved
         <a href="http://www.example.org/license.xhtml" rel="xhv:license" resource="[]">The Foo Document</a>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0299.html'});
@@ -4508,7 +4508,7 @@ whitespace     preserved
       subject: 'http://www.example.org/',
       predicate: 'http://www.w3.org/1999/xhtml/vocab#license',
       object: 'http://www.example.org/license.xhtml'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -4523,7 +4523,7 @@ whitespace     preserved
         <a href="http://www.example.org/license.xhtml" property="xhv:license" resource="[]">The Foo Document</a>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0300.html'});
@@ -4533,7 +4533,7 @@ whitespace     preserved
       subject: 'http://www.example.org/',
       predicate: 'http://www.w3.org/1999/xhtml/vocab#license',
       object: 'http://www.example.org/license.xhtml'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
@@ -4550,7 +4550,7 @@ whitespace     preserved
         </p>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0300.html'});
@@ -4571,7 +4571,7 @@ whitespace     preserved
         </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0302.html'});
@@ -4581,35 +4581,35 @@ whitespace     preserved
       subject: 'http://openspring.net/scor#me',
       predicate: 'a',
       object: 'http://schema.org/Person'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://openspring.net/scor#me',
       predicate: 'a',
       object: 'http://xmlns.com/foaf/0.1/Person'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
 
     const thirdTriple = {
       subject: 'http://openspring.net/scor#me',
       predicate: 'a',
       object: 'http://purl.org/dc/terms/Agent'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirdTriple), true);
 
     const fourthTriple = {
       subject: 'http://openspring.net/scor#me',
       predicate: 'http://schema.org/name',
       object: 'Stéphane Corlosquet'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, fourthTriple), true);
 
     const fifthTriple = {
       subject: 'http://openspring.net/scor#me',
       predicate: 'http://schema.org/homepage',
       object: 'http://openspring.net/'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, fifthTriple), true);
   });
 
@@ -4628,7 +4628,7 @@ whitespace     preserved
           </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0311.html'});
@@ -4649,7 +4649,7 @@ whitespace     preserved
         </p>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0312.html'});
@@ -4673,7 +4673,7 @@ whitespace     preserved
         </dl>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0315.html'});
@@ -4697,7 +4697,7 @@ whitespace     preserved
         </dl>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0316.html'});
@@ -4721,7 +4721,7 @@ whitespace     preserved
         </dl>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0317.html'});
@@ -4731,21 +4731,21 @@ whitespace     preserved
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0317.html',
       predicate: 'http://purl.org/ontology/po/role',
       object: 'http://example.org/profiles/director.html'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://example.org/profiles/director.html',
       predicate: 'a',
       object: 'http://purl.org/ontology/po/Role'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
 
     const thirdTriple = {
       subject: 'http://example.org/profiles/director.html',
       predicate: 'http://www.w3.org/2000/01/rdf-schema#label',
       object: 'Director'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirdTriple), true);
   });
 
@@ -4765,7 +4765,7 @@ whitespace     preserved
           </div>
         </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0318.html'});
@@ -4787,7 +4787,7 @@ whitespace     preserved
         <p resource="_:a" typeof="rdfa:Pattern">Name: <span property="name">Amanda</span></p>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0321.html'});
@@ -4810,7 +4810,7 @@ whitespace     preserved
         <p resource="_:surname" typeof="rdfa:Pattern">My name is <span property="name">Kellogg</span></p>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0322.html'});
@@ -4835,7 +4835,7 @@ whitespace     preserved
         <p resource="_:a" typeof="rdfa:Pattern">Name: <span property="schema:name foaf:name">Amanda</span></p>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0323.html'});
@@ -4860,7 +4860,7 @@ whitespace     preserved
         <p resource="_:a" typeof="rdfa:Pattern">Name: <span property="schema:name foaf:name">Amanda</span></p>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0324.html'});
@@ -4886,7 +4886,7 @@ whitespace     preserved
         </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0324.html'});
@@ -4910,7 +4910,7 @@ whitespace     preserved
         <p resource="#unreferenced" typeof="rdfa:Pattern">Name: <span property="name">Lola</span></p>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0325.html'});
@@ -4934,7 +4934,7 @@ whitespace     preserved
         <p resource="#unreferenced" typeof="rdfa:Pattern">Name: <span property="name">Lola</span></p>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0326.html'});
@@ -4967,7 +4967,7 @@ whitespace     preserved
         </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0327.html'});
@@ -5000,7 +5000,7 @@ whitespace     preserved
         </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0328.html'});
@@ -5022,7 +5022,7 @@ whitespace     preserved
         </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0329.html'});
@@ -5032,21 +5032,21 @@ whitespace     preserved
       subject: 'http://example.org/foaf#me',
       predicate: 'http://xmlns.com/foaf/0.1/familyName',
       object: 'Doe'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://example.org/foaf#me',
       predicate: 'http://xmlns.com/foaf/0.1/givenName',
       object: 'John'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
 
     const thirdTriple = {
       subject: 'http://example.org/foaf#me',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: '\n          John \n          Doe \n        '
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirdTriple), true);
   });
 
@@ -5061,7 +5061,7 @@ whitespace     preserved
         <div property="dc:date" datatype="xsd:date">2010-11-12</div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0330.html'});
@@ -5080,7 +5080,7 @@ whitespace     preserved
         <div property="dcterms:language" datatype="dcterms:RFC5646" content="af">Afrikaans</div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0331.html'});
@@ -5099,7 +5099,7 @@ whitespace     preserved
         <div property="dcterms:language" datatype="" content="af">Afrikaans</div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0332.html'});
@@ -5118,7 +5118,7 @@ whitespace     preserved
         <time property="rdf:value" content="2012-03-12" datetime="2012-03-11" datatype="xsd:date">10 March 2012 at midnight</time>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0333.html'});
@@ -5142,32 +5142,31 @@ whitespace     preserved
         </div>
       </body>
       </html>
-    `
+    `;
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0334.html'});
     const triples = flatten(blocks.map(b => b.context));
-    console.log(JSON.stringify(triples))
     
     const firstTriple = {
       subject: 'http://example.org/base',
       predicate: 'http://schema.org/uri',
       object: 'http://example.orb/val1'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://greggkellogg.net/#me',
       predicate: 'http://schema.org/name',
       object: 'Gregg Kellogg'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
 
     const thirdTriple = {
       subject: 'http://greggkellogg.net/#me',
       predicate: 'http://xmlns.com/foaf/0.1/homepage',
       object: 'http://greggkellogg.net/'
-    } 
+    }; 
     assert.strictEqual(tripleAppearsInArray(triples, thirdTriple), true);
   });
 });
