@@ -3079,7 +3079,7 @@ whitespace     preserved
     `
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
-    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0247.html'});
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0249.html'});
     const triples = flatten(blocks.map(b => b.context));
     // Blank nodes
   });
@@ -3098,7 +3098,7 @@ whitespace     preserved
     `
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
-    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0247.html'});
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0250.html'});
     const triples = flatten(blocks.map(b => b.context));
     
     const firstTriple = {
@@ -3131,6 +3131,33 @@ whitespace     preserved
     `
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0251.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://example.org/node',
+      predicate: 'http://example.org/property',
+      object: 'chat',
+      language: 'fr'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0252: lang inheritance', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html prefix="ex: http://example.org/">
+        <head about="" lang="fr">
+          <title lang="en">Test 0252</title>
+          <meta about="http://example.org/node" property="ex:property" content="chat" />
+        </head>
+        <body>
+          <p></p>
+        </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0247.html'});
     const triples = flatten(blocks.map(b => b.context));
     
@@ -3143,4 +3170,2004 @@ whitespace     preserved
     assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
   });
 
+  it('Test 0253: plain literal with datatype="" and lang preservation', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html prefix="ex: http://example.org/">
+        <head>
+        <title>Test 0108</title>
+        </head>
+        <body>
+          <p about="http://example.org/node" property="ex:property"
+            datatype="" lang="el">ελληνικό
+      άσπρο   διάστημα
+      </p>
+        </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0253.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://example.org/node',
+      predicate: 'http://example.org/property',
+      object: 'ελληνικό\nάσπρο   διάστημα\n',
+      language: 'el'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0254: @datatype="" generates plain literal in presence of child nodes details', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html prefix="ex: http://example.org/terms#">
+      <head> 
+        <title>Test 0254</title> 
+        <base href="http://example.org/"/> 
+      </head> 
+      <body lang="en"> 
+        <p property="ex:prop" datatype="">A <strong>plain literal</strong> with a lang tag.</p> 
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0254.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://example.org/node',
+      predicate: 'http://example.org/terms#prop',
+      object: 'A plain literal with a lang tag.',
+      language: 'en'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0255: lang="" clears language setting', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html prefix="ex: http://example.org/terms#">
+      <head> 
+        <title>Test 0255</title> 
+        <base href="http://example.org/"/> 
+      </head> 
+      <body lang="en"> 
+        <p property="ex:prop" lang="">Just a plain literal.</p> 
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0255.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://example.org/node',
+      predicate: 'http://example.org/terms#prop',
+      object: 'Just a plain literal.',
+      language: ''
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0257: element with @property and no child nodes generates empty plain literal (HTML5 version of 0113)', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html prefix="dc: http://purl.org/dc/elements/1.1/">
+        <head>
+          <title>Test 0257</title>
+        </head>
+        <body>
+          <span about="#a" property="dc:title"></span>
+        </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0257.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0257.html#a',
+      predicate: 'http://purl.org/dc/elements/1.1/title',
+      object: '',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0259: XML+RDFa Initial Context', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0259</title>
+      </head>
+      <body>
+        <div>
+          Vocabulary Prefixes
+          <span property="csvw:">CSVW</span>
+          <span property="dcat:">DCAT</span>
+          <span property="qb:">QB</span>
+          <span property="grddl:">GRDDL</span>
+          <span property="ma:">MA</span>
+          <span property="org:">ORG</span>ORG
+          <span property="owl:">OWL</span>
+          <span property="prov:">PROV</span>
+          <span property="rdf:">RDF</span>
+          <span property="rdfa:">RDFa</span>
+          <span property="rdfs:">RDFS</span>
+          <span property="rif:">RIF</span>
+          <span property="rr:">RR</span>
+          <span property="sd:">SD</span>
+          <span property="skos:">SKOS</span>
+          <span property="skosxl:">SKOS-XL</span>
+          <span property="wdr:">WDR</span>
+          <span property="void:">VOID</span>
+          <span property="wdrs:">WDRS</span>
+          <span property="xhv:">XHV</span>
+          <span property="xml:">XML</span>
+          <span property="xsd:">XSD</span>
+        </div>
+        <div>
+          Widely Used prefixes
+          <span property="cc:">CC</span>
+          <span property="ctag:">CTAG</span>
+          <span property="dc:">DC</span>
+          <span property="dcterms:">DCTERMS</span>
+          <span property="foaf:">FOAF</span>
+          <span property="gr:">GR</span>
+          <span property="ical:">ICAL</span>
+          <span property="og:">OG</span>
+          <span property="rev:">REV</span>
+          <span property="sioc:">SIOC</span>
+          <span property="v:">V</span>
+          <span property="vcard:">VCARD</span>
+          <span property="schema:">Schema</span>
+        </div>
+        <div>
+          Vocabulary Terms
+          <span property="describedby">DescribedBy</span>
+          <span property="license">License</span>
+          <span property="role">Role</span>
+        </div>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/ns/csvw#',
+      object: 'CSVW',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+
+    const secondTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/ns/dcat#',
+      object: 'DCAT',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
+
+    const thirdTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://purl.org/linked-data/cube#',
+      object: 'QB',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, thirdTriple), true);
+
+    const fourthTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/2003/g/data-view#',
+      object: 'GRDDL',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, fourthTriple), true);
+
+    const fifthTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/ns/ma-ont#',
+      object: 'MA',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, fifthTriple), true);
+
+    const sixthTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/ns/org#',
+      object: 'ORG',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, sixthTriple), true);
+
+    const seventhTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/2002/07/owl#',
+      object: 'OWL',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, seventhTriple), true);
+
+    const eightTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/ns/prov#',
+      object: 'PROV',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, eightTriple), true);
+
+    const ninethTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+      object: 'RDF',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, ninethTriple), true);
+
+    const tenthTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/ns/rdfa#',
+      object: 'RDFa',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, tenthTriple), true);
+
+    const eleventhTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/2000/01/rdf-schema#',
+      object: 'RDFS',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, eleventhTriple), true);
+
+    const twelvethTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/2007/rif#',
+      object: 'RIF',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, twelvethTriple), true);
+
+    const thirteenthTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/ns/r2rml#',
+      object: 'RR',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, thirteenthTriple), true);
+
+    const fourteenthTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/ns/sparql-service-description#',
+      object: 'SD',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, fourteenthTriple), true);
+
+    const fifteenthTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/2004/02/skos/core#',
+      object: 'SKOS',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, fifteenthTriple), true);
+
+    const sixteenthTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/2008/05/skos-xl#',
+      object: 'SKOS-XL',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, sixteenthTriple), true);
+
+    const seventeenthtriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/2007/05/powder#',
+      object: 'WDR',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, seventeenthtriple), true);
+
+    const eightteenthTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://rdfs.org/ns/void#',
+      object: 'VOID',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, eightteenthTriple), true);
+
+    const nineteenthTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/2007/05/powder-s#',
+      object: 'WDRS',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, nineteenthTriple), true);
+
+    const twentythTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/1999/xhtml/vocab#',
+      object: 'XHV',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, twentythTriple), true);
+
+    const twentyfirstTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/XML/1998/namespace',
+      object: 'XML',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, twentyfirstTriple), true);
+
+    const twentysecondTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/2001/XMLSchema#',
+      object: 'XSD',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, twentysecondTriple), true);
+
+    const twentythirdTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://creativecommons.org/ns#',
+      object: 'CC',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, twentythirdTriple), true);
+
+    const twentyfourthTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://commontag.org/ns#',
+      object: 'CTAG',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, twentyfourthTriple), true);
+
+    const twentyfifthTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://commontag.org/ns#',
+      object: 'CTAG',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, twentyfifthTriple), true);
+
+    const twentysixthTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://purl.org/dc/terms/',
+      object: 'DC',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, twentysixthTriple), true);
+
+    const twentyseventhTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://purl.org/dc/terms/',
+      object: 'DCTERMS',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, twentyseventhTriple), true);
+
+    const twentyeigthTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://xmlns.com/foaf/0.1/',
+      object: 'FOAF',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, twentyeigthTriple), true);
+
+    const twentyninethTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://purl.org/goodrelations/v1#',
+      object: 'GR',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, twentyninethTriple), true);
+
+    const thirtythTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/2002/12/cal/icaltzd#',
+      object: 'ICAL',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, thirtythTriple), true);
+
+    const thirtyfirstTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://ogp.me/ns#',
+      object: 'OG',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, thirtyfirstTriple), true);
+
+    const thirtysecondTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://purl.org/stuff/rev#',
+      object: 'REV',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, thirtysecondTriple), true);
+
+    const thirtythirdTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://rdfs.org/sioc/ns#',
+      object: 'SIOC',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, thirtythirdTriple), true);
+
+    const thirtyfourthTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://rdf.data-vocabulary.org/#',
+      object: 'V',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, thirtyfourthTriple), true);
+
+    const thirtyfifthTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/2006/vcard/ns#',
+      object: 'VCARD',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, thirtyfifthTriple), true);
+
+    const thirtysixthTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://schema.org/',
+      object: 'Schema',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, thirtysixthTriple), true);
+
+    const thirtySeventhTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/2007/05/powder-s#describedby',
+      object: 'DescribedBy',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, thirtySeventhTriple), true);
+
+    const thirtyEightthTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/1999/xhtml/vocab#license',
+      object: 'License',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, thirtyEightthTriple), true);
+
+    const thirtyNinethTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0259.html',
+      predicate: 'http://www.w3.org/1999/xhtml/vocab#role',
+      object: 'Role',
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, thirtyNinethTriple), true);
+  });
+
+  it('Test 0261: White space preservation in XMLLiteral', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html prefix="ex: http://example.org/rdf/ rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+      <head>
+        <title>Test 0261</title>
+      </head>
+      <body>
+        <div about="http://www.example.org">
+          <p property="ex:xmllit" datatype="rdf:XMLLiteral">This is
+      an XMLLiteral</p>
+      </div>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0257.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://www.example.org',
+      predicate: 'http://example.org/rdf/xmllit',
+      object: 'This is\n      an XMLLiteral',
+      datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0262: Predicate establishment with @property, with white spaces before and after the attribute value', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html prefix="dc: http://purl.org/dc/elements/1.1/">
+      <head>
+        <title>Test 0262</title>
+      </head>
+      <body>
+        <p>This photo was taken by <span class="author" about="photo1.jpg" property="    dc:creator
+      ">Mark Birbeck</span>.</p>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0262.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/photo1.jpg',
+      predicate: 'http://purl.org/dc/elements/1.1/creator',
+      object: 'Mark Birbeck'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0263: @property appearing on the html element yields the base as the subject', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html property="rdfs:seeAlso" resource="http://www.example.org">
+      <head >
+        <title>Test 0263</title>
+      </head>
+      <body>
+        <p> </p>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0263.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0263.html',
+      predicate: 'http://www.w3.org/2000/01/rdf-schema#seeAlso',
+      object: 'http://www.example.org'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0264: @property appearing on the head element gets the subject from , ie, parent', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head  property="rdfs:seeAlso" resource="http://www.example.org">
+        <title>Test 0264</title>
+      </head>
+      <body>
+        <p> </p>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0264.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0264.html',
+      predicate: 'http://www.w3.org/2000/01/rdf-schema#seeAlso',
+      object: 'http://www.example.org'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0265: @property appearing on the head element gets the subject from , ie, parent', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html about="http://www.example.com">
+      <head  property="rdfs:seeAlso" resource="http://www.example.org">
+        <title>Test 0265</title>
+      </head>
+      <body>
+        <p> </p>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0265.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://www.example.com',
+      predicate: 'http://www.w3.org/2000/01/rdf-schema#seeAlso',
+      object: 'http://www.example.org'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0266: @property without @content or @datatype, typed object set by @href and @typeof', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0266</title>
+      </head>
+      <body>
+        <div about="http://www.w3.org/Person/Ivan#me">
+          <a href="http://www.ivan-herman.net/foaf#me" typeof="foaf:Person" property="owl:sameAs">Ivan Herman</a>
+        </div>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0266.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://www.w3.org/Person/Ivan#me',
+      predicate: 'http://www.w3.org/2002/07/owl#sameAs',
+      object: 'http://www.ivan-herman.net/foaf#me'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+
+    const secondTriple = {
+      subject: 'http://www.ivan-herman.net/foaf#me',
+      predicate: 'a',
+      object: 'http://xmlns.com/foaf/0.1/Person'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
+  });
+
+  it('Test 0267: @property without @content or @datatype, typed object set by @resource and @typeof', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0267</title>
+      </head>
+      <body>
+        <div about="http://www.w3.org/Person/Ivan#me">
+          <p resource="http://www.ivan-herman.net/foaf#me" typeof="foaf:Person" property="owl:sameAs">Ivan Herman</p>
+        </div>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0267.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://www.w3.org/Person/Ivan#me',
+      predicate: 'http://www.w3.org/2002/07/owl#sameAs',
+      object: 'http://www.ivan-herman.net/foaf#me'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+
+    const secondTriple = {
+      subject: 'http://www.ivan-herman.net/foaf#me',
+      predicate: 'a',
+      object: 'http://xmlns.com/foaf/0.1/Person'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
+  });
+
+  it('Test 0268: @property without @content or @datatype, typed object set by @src and @typeof', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0268</title>
+      </head>
+      <body>
+        <div about="http://www.ivan-herman.net/foaf#me">
+          <img src="http://www.ivan-herman.net/Images/me2003-small.png" typeof="foaf:Image" property="foaf:depiction" alt="Ivan Herman" />
+        </div>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0268.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://www.ivan-herman.net/foaf#me',
+      predicate: 'http://xmlns.com/foaf/0.1/depiction',
+      object: 'http://www.ivan-herman.net/Images/me2003-small.png'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+
+    const secondTriple = {
+      subject: 'http://www.ivan-herman.net/Images/me2003-small.png',
+      predicate: 'a',
+      object: 'http://xmlns.com/foaf/0.1/Image'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
+  });
+
+  it('Test 0269: Use of @property in HEAD without explicit subject', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html property="rdfs:comment" content="This is an RDFa test">
+      <head >
+        <title>Test 0269</title>
+      </head>
+      <body>
+        <p> </p>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0269.html'});
+    const triples = flatten(blocks.map(b => b.context));
+
+    const firstTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0269.html',
+      predicate: 'http://www.w3.org/2000/01/rdf-schema#comment',
+      object: 'This is an RDFa test'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0271: Use of @property in HEAD with explicit parent subject via @about', function() {
+    const html = `
+    <!DOCTYPE html>
+    <html about="http://www.example.org/">
+    <head property="rdfs:comment" content="This is an RDFa test">
+      <title>Test 0269</title>
+    </head>
+    <body>
+      <p> </p>
+    </body>
+    </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0271.html'});
+    const triples = flatten(blocks.map(b => b.context));
+
+    const firstTriple = {
+      subject: 'http://www.example.org/',
+      predicate: 'http://www.w3.org/2000/01/rdf-schema#comment',
+      object: 'This is an RDFa test'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0272: time element with @datetime an xsd:date', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0272</title>
+      </head>
+      <body>
+        <time property="rdf:value" datetime="2012-03-18">18 March 2012</time>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0272.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    //Blank nodes
+  });
+
+  it('Test 0273: time element with @datetime an xsd:time', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0273</title>
+      </head>
+      <body>
+        <time property="rdf:value" datetime="00:00:00">midnight</time>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0273.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    //Blank nodes
+  });
+
+  it('Test 0274: time element with @datetime an xsd:dateTime', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0274</title>
+      </head>
+      <body>
+        <time property="rdf:value" datetime="2012-03-18T00:00:00Z">18 March 2012 at midnight</time>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0274.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    //Blank nodes
+  });
+
+  it('Test 0275: time element with value an xsd:date', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0275</title>
+      </head>
+      <body>
+        <time property="rdf:value">2012-03-18</time>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0275.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    //Blank nodes
+  });
+
+  it('Test 0276: time element with value an xsd:time', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0275</title>
+      </head>
+      <body>
+        <time property="rdf:value">00:00:00</time>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0276.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    //Blank nodes
+  });
+
+  it('Test 0277: time element with value an xsd:dateTime', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0277</title>
+      </head>
+      <body>
+        <time property="rdf:value">2012-03-18T00:00:00Z</time>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0277.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    //Blank nodes
+  });
+
+  it('Test 0278: @content overrides @datetime', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0278</title>
+      </head>
+      <body>
+        <p>The value of @content has a higher priority than @datetime</p>
+        <time property="rdf:value" datetime="2012-03-18" content="this should be the value">18 March 2012</time>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0278.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    //Blank nodes
+  });
+
+  it('Test 0279: @datatype used with @datetime overrides default datatype', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0279</title>
+      </head>
+      <body>
+        <time property="rdf:value" datetime="2012-03-18T00:00:00Z" datatype="xsd:date">18 March 2012 at midnight</time>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0279.html'});
+    const triples = flatten(blocks.map(b => b.context));
+
+    const firstTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0279.html',
+      predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value',
+      object: '2012-03-18T00:00:00Z',
+      datatype: 'http://www.w3.org/2001/XMLSchema#date'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0281: time element with @datetime an xsd:gYear', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0281</title>
+      </head>
+      <body>
+        <time property="rdf:value" datetime="2012">Two Thousand Twelve</time>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0281.html'});
+    const triples = flatten(blocks.map(b => b.context));
+
+    const firstTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0281.html',
+      predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value',
+      object: '2012',
+      datatype: 'http://www.w3.org/2001/XMLSchema#gYear'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0282: time element with @datetime an xsd:gYearMonth', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0282</title>
+      </head>
+      <body>
+        <time property="rdf:value" datetime="2012-03">March, Two Thousand Twelve</time>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0282.html'});
+    const triples = flatten(blocks.map(b => b.context));
+
+    const firstTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0282.html',
+      predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value',
+      object: '2012-03',
+      datatype: 'http://www.w3.org/2001/XMLSchema#gYearMonth'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0283: time element with @datetime an invalid datatype generates plain literal', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0283</title>
+      </head>
+      <body>
+        <time property="rdf:value"> 2012-03-18</time>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0282.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    //Blank nodes
+  });
+
+  it('Test 0284: time element not matching datatype but with explicit @datatype', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0284</title>
+      </head>
+      <body>
+        <time property="rdf:value" datatype="xsd:dateTime"> 2012-03-18</time>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0284.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0284.html',
+      predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value',
+      object: ' 2012-03-18',
+      datatype: 'http://www.w3.org/2001/XMLSchema#dateTime'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0287: time element with @datetime an xsd:dateTime with TZ offset', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0287</title>
+      </head>
+      <body>
+        <time property="rdf:value" datetime="2012-03-18T00:00:00-08:00">18 March 2012 at midnight in San Francisco</time>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0287.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    //Blank nodes
+  });
+
+  it('Test 0289: @href becomes subject when @property and @content are present', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0289</title>
+      </head>
+      <body>
+        <h1>@href becomes subject when @property and @content are present</h1>
+        <a href="http://example.org/" property="rdf:value" content="value">ignored</a>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0289.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://example.org/',
+      predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value',
+      object: 'value'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0290: @href becomes subject when @property and @datatype are present', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0290</title>
+      </head>
+      <body>
+        <h1>@href becomes subject when @property and @datatype are present</h1>
+        <a href="http://example.org/" property="rdf:value" datatype="">value</a>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0290.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://example.org/',
+      predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value',
+      object: 'value'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0291: @href as subject overridden by @about', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html prefix="rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+      <head>
+        <title>Test 0291</title>
+      </head>
+      <body>
+        <h1>@href as subject overridden by @about</h1>
+        <a about="http://example.net/" href="http://example.org/" property="rdf:value" content="value">ignored</a>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0291.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://example.net/',
+      predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value',
+      object: 'value'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0292: @about overriding @href as subject is used as parent resource', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html prefix="rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+      <head>
+        <title>Test 0292</title>
+      </head>
+      <body>
+        <h1>@about overriding @href as subject is used as parent resource</h1>
+        <a about="http://example.net/" href="http://example.org/" property="rdf:value" content="value one">
+          <span property="rdf:value">value two</span>
+        </a>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0292.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://example.net/',
+      predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value',
+      object: 'value one'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+
+    const secondTriple = {
+      subject: 'http://example.net/',
+      predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value',
+      object: 'value two'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
+  });
+
+  it('Test 0293: Testing the ":" character usage in a CURIE', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0293</title>
+      </head>
+      <body>
+        <h1>Testing the ':' character usage in a CURIE</h1>
+        <div prefix="ex: http://www.example.org/">
+          <p about="http://www.example.org" property="ex:column:test">Test</p>
+        </div>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0293.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://www.example.org',
+      predicate: 'http://www.example.org/column:test',
+      object: 'Test'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0296: @property does set parent object without @typeof', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0296</title>
+      </head>
+      <body>
+        <div vocab="http://xmlns.com/foaf/0.1/" resource="http://example.com/gregg/#me" typeof="Person">
+          <a property="homepage" href="http://example.com/gregg/"><span property="name">Gregg</span></a>
+          Knows
+          <ul>
+            <li property="knows" resource="http://example.com/niklas/#me" typeof="Person">
+              <a property="homepage" href="http://example.com/niklas/"><span property="name">Niklas</span></a>
+            </li>
+            <li property="knows" resource="http://example.com/stéphane/#me" typeof="Person">
+              <a property="homepage" href="http://example.com/stéphane/"><span property="name">Stéphane</span></a>
+            </li>
+            <li property="knows" resource="http://example.com/ivan/#me" typeof="Person">
+              <a property="homepage" href="http://example.com/ivan/"><span property="name">Ivan</span></a>
+            </li>
+            <li property="knows" resource="http://example.com/manu/#me" typeof="Person">
+              <a property="homepage" href="http://example.com/manu/"><span property="name">Manu</span></a>
+            </li>
+          </ul>
+        </div>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0296.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://example.com/gregg/#me',
+      predicate: 'a',
+      object: 'http://xmlns.com/foaf/0.1/Person'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+
+    const secondTriple = {
+      subject: 'http://example.com/niklas/#me',
+      predicate: 'a',
+      object: 'http://xmlns.com/foaf/0.1/Person'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
+
+    const thirdTriple = {
+      subject: 'http://example.com/stéphane/#me',
+      predicate: 'a',
+      object: 'http://xmlns.com/foaf/0.1/Person'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, thirdTriple), true);
+
+    const fourthTriple = {
+      subject: 'http://example.com/ivan/#me',
+      predicate: 'a',
+      object: 'http://xmlns.com/foaf/0.1/Person'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, fourthTriple), true);
+
+    const fifthTriple = {
+      subject: 'http://example.com/manu/#me',
+      predicate: 'a',
+      object: 'http://xmlns.com/foaf/0.1/Person'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, fifthTriple), true);
+
+    const sixthTriple = {
+      subject: 'http://example.com/gregg/#me',
+      predicate: 'http://xmlns.com/foaf/0.1/name',
+      object: 'Gregg'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, sixthTriple), true);
+
+    const seventhTriple = {
+      subject: 'http://example.com/niklas/#me',
+      predicate: 'http://xmlns.com/foaf/0.1/name',
+      object: 'Niklas'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, seventhTriple), true);
+
+    const eightTriple = {
+      subject: 'http://example.com/stéphane/#me',
+      predicate: 'http://xmlns.com/foaf/0.1/name',
+      object: 'Stéphane'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, eightTriple), true);
+
+    const ninethTriple = {
+      subject: 'http://example.com/ivan/#me',
+      predicate: 'http://xmlns.com/foaf/0.1/name',
+      object: 'Ivan'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, ninethTriple), true);
+
+    const tenthTriple = {
+      subject: 'http://example.com/manu/#me',
+      predicate: 'http://xmlns.com/foaf/0.1/name',
+      object: 'Manu'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, tenthTriple), true);
+
+    const eleventhTriple = {
+      subject: 'http://example.com/gregg/#me',
+      predicate: 'http://xmlns.com/foaf/0.1/knows',
+      object: 'http://example.com/niklas/#me'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, eleventhTriple), true);
+
+    const twelvethTriple = {
+      subject: 'http://example.com/gregg/#me',
+      predicate: 'http://xmlns.com/foaf/0.1/knows',
+      object: 'http://example.com/stéphane/#me'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, twelvethTriple), true);
+
+    const thirteenthTriple = {
+      subject: 'http://example.com/gregg/#me',
+      predicate: 'http://xmlns.com/foaf/0.1/knows',
+      object: 'http://example.com/ivan/#me'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, thirteenthTriple), true);
+
+    const fourteenthTriple = {
+      subject: 'http://example.com/gregg/#me',
+      predicate: 'http://xmlns.com/foaf/0.1/knows',
+      object: 'http://example.com/manu/#me'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, fourteenthTriple), true);
+  });
+
+  it('Test 0297: @about=[] with @typeof does not create a new subject', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0297: Testing @typeof and @about=[]</title>
+      </head>
+      <body>
+        <div about="[]" typeof="foaf:Person" property="foaf:name">Alex Milowski</div>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0297.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    //Blank nodes
+  });
+
+  it('Test 0298: @about=[] with @typeof does not create a new object', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0298: Testing @typeof and @about=[]</title>
+      </head>
+      <body>
+        <div about="[]" typeof="foaf:Person">
+          <span property="foaf:name">Alex Milowski</span>
+        </div>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0298.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    //Blank nodes
+  });
+
+  it('Test 0299: @resource=[] with @href or @src uses @href or @src (@rel)', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0299: Testing @resource=[]</title>
+      </head>
+      <body about="http://www.example.org/">
+        <a href="http://www.example.org/license.xhtml" rel="xhv:license" resource="[]">The Foo Document</a>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0299.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://www.example.org/',
+      predicate: 'http://www.w3.org/1999/xhtml/vocab#license',
+      object: 'http://www.example.org/license.xhtml'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0300: @resource=[] with @href or @src uses @href or @src (@property)', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0300: Testing @resource=[]</title>
+      </head>
+      <body about="http://www.example.org/">
+        <a href="http://www.example.org/license.xhtml" property="xhv:license" resource="[]">The Foo Document</a>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0300.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://www.example.org/',
+      predicate: 'http://www.w3.org/1999/xhtml/vocab#license',
+      object: 'http://www.example.org/license.xhtml'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+  });
+
+  it('Test 0301: @property with @typeof creates a typed_resource for chaining', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0301: Typed Property</title>
+      </head>
+      <body>
+        <p vocab="http://www.milowski.com/V/" property="bit" typeof="thing">
+          <span property="name">Fizzbit</span>
+        </p>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0300.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    //Blank nodes
+  });
+
+  it('Test 0302: @typeof with different content types', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0302: various types of tokens in @typeof</title>
+      </head>
+      <body>
+        <div vocab="http://schema.org/" resource="http://openspring.net/scor#me" typeof="Person foaf:Person http://purl.org/dc/terms/Agent">
+          <a property="homepage" href="http://openspring.net/"><span property="name">Stéphane Corlosquet</span></a>
+        </div>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0302.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://openspring.net/scor#me',
+      predicate: 'a',
+      object: 'http://schema.org/Person'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+
+    const secondTriple = {
+      subject: 'http://openspring.net/scor#me',
+      predicate: 'a',
+      object: 'http://xmlns.com/foaf/0.1/Person'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
+
+    const thirdTriple = {
+      subject: 'http://openspring.net/scor#me',
+      predicate: 'a',
+      object: 'http://purl.org/dc/terms/Agent'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, thirdTriple), true);
+
+    const fourthTriple = {
+      subject: 'http://openspring.net/scor#me',
+      predicate: 'http://schema.org/name',
+      object: 'Stéphane Corlosquet'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, fourthTriple), true);
+
+    const fifthTriple = {
+      subject: 'http://openspring.net/scor#me',
+      predicate: 'http://schema.org/homepage',
+      object: 'http://openspring.net/'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, fifthTriple), true);
+  });
+
+  it('Test 0311: Ensure no triples are generated when @property is empty : (Negative parser test)', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0311</title>
+      </head>
+      <body>
+          <div>
+            <span class="attribution-line">this photo was taken by
+              <span property="">Stéphane Corlosquet</span>
+            </span>
+          </div>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0311.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    assert.strictEqual(triples.length, 0)
+  });
+
+  it('Test 0312: Mute plain @rel if @property is present', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0312</title>
+      </head>
+      <body>
+        <p vocab="http://schema.org/" typeof="Person">
+          The homepage of <a href="http://example.org/" property="homepage" rel="nofollow">Some Body</a>.
+        </p>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0312.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    //Blank nodes
+  });
+
+  it('Test 0315: @property and @typeof with incomplete triples', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0315</title>
+      </head>
+      <body prefix="po: http://example.org/">
+        <dl>
+          <dt rel="po:role" class="role">
+            <span typeof="po:Role" property="rdfs:label">Director</span>
+          </dt>
+          <dd></dd>
+        </dl>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0315.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    //Blank nodes
+  });
+
+  it('Test 0316: @property and @typeof with incomplete triples (@href variant)', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0316</title>
+      </head>
+      <body prefix="po: http://example.org/">
+        <dl>
+          <dt rel="po:role" class="role">
+            <a typeof="po:Role" property="rdfs:label" href="http://example.org/profiles/director.html">Director</a>
+          </dt>
+          <dd></dd>
+        </dl>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0316.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    //Blank nodes
+  });
+
+  it('Test 0317: @datatype inhibits new @property behavior', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0316</title>
+      </head>
+      <body prefix="po: http://purl.org/ontology/po/">
+        <dl>
+          <dt rel="po:role" class="role">
+            <a typeof="po:Role" property="rdfs:label" datatype="" href="http://example.org/profiles/director.html">Director</a>
+          </dt>
+          <dd></dd>
+        </dl>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0317.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    
+    const firstTriple = {
+      subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0317.html',
+      predicate: 'http://purl.org/ontology/po/role',
+      object: 'http://example.org/profiles/director.html'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+
+    const secondTriple = {
+      subject: 'http://example.org/profiles/director.html',
+      predicate: 'a',
+      object: 'http://purl.org/ontology/po/Role'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
+
+    const thirdTriple = {
+      subject: 'http://example.org/profiles/director.html',
+      predicate: 'http://www.w3.org/2000/01/rdf-schema#label',
+      object: 'Director'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, thirdTriple), true);
+  });
+
+  it('Test 0318: Setting @vocab to empty strings removes default vocabulary', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Test 0318</title>
+        </head>
+        <body>
+          <div vocab="http://xmlns.com/foaf/0.1/">
+            <div about ="#me">
+              <p property="name">Ivan Herman</p>
+              <meta vocab="" property="prop" content="value"/>
+            </div>
+          </div>
+        </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0318.html'});
+    const triples = flatten(blocks.map(b => b.context));
+   // Blank nodes
+  });
+
+  it('Test 0321: rdfa:copy to rdfa:Pattern', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0321</title>
+      </head>
+      <body vocab="http://schema.org/">
+        <div typeof="Person">
+          <link property="rdfa:copy" resource="_:a"/>
+        </div>
+        <p resource="_:a" typeof="rdfa:Pattern">Name: <span property="name">Amanda</span></p>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0321.html'});
+    const triples = flatten(blocks.map(b => b.context));
+   // Blank nodes
+  });
+
+  it('Test 0322: rdfa:copy for additional property value', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0322</title>
+      </head>
+      <body vocab="http://schema.org/">
+        <div typeof="Person">
+          <p>My name is <span property="name">Gregg</span></p>
+          <link property="rdfa:copy" resource="_:surname"/>
+        </div>
+        <p resource="_:surname" typeof="rdfa:Pattern">My name is <span property="name">Kellogg</span></p>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0322.html'});
+    const triples = flatten(blocks.map(b => b.context));
+   // Blank nodes
+  });
+
+  it('Test 0323: Multiple references to rdfa:Pattern', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0323</title>
+      </head>
+      <body>
+        <div typeof="schema:Person">
+          <link property="rdfa:copy" resource="_:a"/>
+        </div>
+        <div typeof="foaf:Person">
+          <link property="rdfa:copy" resource="_:a"/>
+        </div>
+        <p resource="_:a" typeof="rdfa:Pattern">Name: <span property="schema:name foaf:name">Amanda</span></p>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0323.html'});
+    const triples = flatten(blocks.map(b => b.context));
+   // Blank nodes
+  });
+
+  it('Test 0324: Multiple references to rdfa:Pattern details', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0323</title>
+      </head>
+      <body>
+        <div typeof="schema:Person">
+          <link property="rdfa:copy" resource="_:a"/>
+        </div>
+        <div typeof="foaf:Person">
+          <link property="rdfa:copy" resource="_:a"/>
+        </div>
+        <p resource="_:a" typeof="rdfa:Pattern">Name: <span property="schema:name foaf:name">Amanda</span></p>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0324.html'});
+    const triples = flatten(blocks.map(b => b.context));
+   // Blank nodes
+  });
+
+  it('Test 0325: Multiple references to rdfa:Pattern creating a resource', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <base href="http://example.org/"/>
+        <title>Test 0325</title>
+      </head>
+      <body vocab="http://schema.org/">
+        <div resource="#foo" typeof=""><link property="rdfa:copy" resource="_:a"/></div>
+        <div resource="#bar" typeof=""><link property="rdfa:copy" resource="_:a"/></div>
+        <div resource="_:a" typeof="rdfa:Pattern">
+          <div property="schema:refers-to" typeof="">
+            <span property="schema:name">Amanda</span>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0324.html'});
+    const triples = flatten(blocks.map(b => b.context));
+   // Blank nodes
+  });
+
+  it('Test 0325: Multiple references to rdfa:Pattern creating a resource', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <base href="http://example.com/"/>
+        <title>Test 0326</title>
+      </head>
+      <body vocab="http://schema.org/">
+        <div resource="#referencing" typeof="Person">
+          <link property="rdfa:copy" resource="#referenced"/>
+        </div>
+        <p resource="#referenced" typeof="rdfa:Pattern">Name: <span property="name">Bella</span></p>
+        <p resource="#unreferenced" typeof="rdfa:Pattern">Name: <span property="name">Lola</span></p>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0325.html'});
+    const triples = flatten(blocks.map(b => b.context));
+   // Blank nodes
+  });
+
+  it('Test 0326: rdfa:Pattern removed only if referenced', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <base href="http://example.com/"/>
+        <title>Test 0326</title>
+      </head>
+      <body vocab="http://schema.org/">
+        <div resource="#referencing" typeof="Person">
+          <link property="rdfa:copy" resource="#referenced"/>
+        </div>
+        <p resource="#referenced" typeof="rdfa:Pattern">Name: <span property="name">Bella</span></p>
+        <p resource="#unreferenced" typeof="rdfa:Pattern">Name: <span property="name">Lola</span></p>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0326.html'});
+    const triples = flatten(blocks.map(b => b.context));
+   // Blank nodes
+  });
+
+  it('Test 0327: rdfa:Pattern chaining', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <base href="http://example.com/"/>
+        <title>Test 0327</title>
+      </head>
+      <body>
+        <div typeof="schema:Person">
+          <link property="rdfa:copy" resource="_:a"/>
+          <link property="rdfa:copy" resource="_:b"/>
+        </div>
+        <p resource="_:a" typeof="rdfa:Pattern">Name: <span property="schema:name">Amanda</span></p>
+        <div resource="_:b" typeof="rdfa:Pattern">
+          <div property="schema:band" typeof=" schema:MusicGroup">
+            <link property="rdfa:copy" resource="_:c"/>
+          </div>
+        </div>
+        <div resource="_:c" typeof="rdfa:Pattern">
+        <p>Band: <span property="schema:name">Jazz Band</span></p>
+        <p>Size: <span property="schema:size">12</span> players</p>
+        </div>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0327.html'});
+    const triples = flatten(blocks.map(b => b.context));
+   // Blank nodes
+  });
+
+  it('Test 0328: @content overrides the content of the time element.', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <base href="http://example.com/"/>
+        <title>Test 0327</title>
+      </head>
+      <body>
+        <div typeof="schema:Person">
+          <link property="rdfa:copy" resource="_:a"/>
+          <link property="rdfa:copy" resource="_:b"/>
+        </div>
+        <p resource="_:a" typeof="rdfa:Pattern">Name: <span property="schema:name">Amanda</span></p>
+        <div resource="_:b" typeof="rdfa:Pattern">
+          <div property="schema:band" typeof=" schema:MusicGroup">
+            <link property="rdfa:copy" resource="_:c"/>
+          </div>
+        </div>
+        <div resource="_:c" typeof="rdfa:Pattern">
+        <p>Band: <span property="schema:name">Jazz Band</span></p>
+        <p>Size: <span property="schema:size">12</span> players</p>
+        </div>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0328.html'});
+    const triples = flatten(blocks.map(b => b.context));
+   // Blank nodes
+  });
+
+  it('Test 0329: Recursive triple generation', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html prefix="foaf: http://xmlns.com/foaf/0.1/">
+      <head>
+        <title>Test 0329</title>
+      </head>
+      <body>
+        <div about="http://example.org/foaf#me" property="foaf:name">
+          <span property="foaf:givenName">John</span> 
+          <span property="foaf:familyName">Doe</span> 
+        </div>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0329.html'});
+    const triples = flatten(blocks.map(b => b.context));
+
+    const firstTriple = {
+      subject: 'http://example.org/foaf#me',
+      predicate: 'http://xmlns.com/foaf/0.1/familyName',
+      object: 'Doe'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+
+    const secondTriple = {
+      subject: 'http://example.org/foaf#me',
+      predicate: 'http://xmlns.com/foaf/0.1/givenName',
+      object: 'John'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
+
+    const thirdTriple = {
+      subject: 'http://example.org/foaf#me',
+      predicate: 'http://xmlns.com/foaf/0.1/name',
+      object: '\n          John \n          Doe \n        '
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, thirdTriple), true);
+  });
+
+  it('Test 0330: @datatype overrides inherited @lang', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html prefix="dcterms: http://purl.org/dc/terms/ xsd: http://www.w3.org/2001/XMLSchema#">
+      <head>
+        <title>Test 0330</title>
+      </head>
+      <body lang="en" xml:lang="en">
+        <div property="dc:date" datatype="xsd:date">2010-11-12</div>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0330.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    //Blank nodes
+  });
+
+  it('Test 0331: @datatype overrides inherited @lang, with @content', function() {
+    const html = `
+      <!DOCTYPE html>
+      <html prefix="dcterms: http://purl.org/dc/terms/">
+      <head>
+        <title>Test 0331</title>
+      </head>
+      <body lang="en" xml:lang="en">
+        <div property="dcterms:language" datatype="dcterms:RFC5646" content="af">Afrikaans</div>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0331.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    //Blank nodes
+  });
+
+  it("Test 0332: Empty @datatype doesn't override inherited @lang, with @content", function() {
+    const html = `
+      <!DOCTYPE html>
+      <html prefix="dcterms: http://purl.org/dc/terms/">
+      <head>
+        <title>Test 0332</title>
+      </head>
+      <body lang="en" xml:lang="en">
+        <div property="dcterms:language" datatype="" content="af">Afrikaans</div>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0332.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    //Blank nodes
+  });
+
+  it("Test 0333: @content overrides @datetime (with @datatype specified)", function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0279</title>
+      </head>
+      <body>
+        <time property="rdf:value" content="2012-03-12" datetime="2012-03-11" datatype="xsd:date">10 March 2012 at midnight</time>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0333.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    //Blank nodes
+  });
+
+  it("Test 0334: @resource changes the current subject for the nested elements", function() {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test 0334: @resource changes the current subject for the nested elements</title>
+      </head>
+      <body>
+        <div vocab="http://schema.org/" resource="http://example.org/base">
+          <a property="uri" href="http://example.orb/val1">Not This</a>
+          <div resource="http://greggkellogg.net/#me">
+            <a property="name" rel="homepage foaf:homepage" href="http://greggkellogg.net/">Gregg Kellogg</a>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+    const dom = new jsdom.JSDOM(html);
+    const domNode = dom.window.document.querySelector('html');
+    const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0334.html'});
+    const triples = flatten(blocks.map(b => b.context));
+    console.log(JSON.stringify(triples))
+    
+    const firstTriple = {
+      subject: 'http://example.org/base',
+      predicate: 'http://schema.org/uri',
+      object: 'http://example.orb/val1'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
+
+    const secondTriple = {
+      subject: 'http://greggkellogg.net/#me',
+      predicate: 'http://schema.org/name',
+      object: 'Gregg Kellogg'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
+
+    const thirdTriple = {
+      subject: 'http://greggkellogg.net/#me',
+      predicate: 'http://xmlns.com/foaf/0.1/homepage',
+      object: 'http://greggkellogg.net/'
+    } 
+    assert.strictEqual(tripleAppearsInArray(triples, thirdTriple), true);
+  });
 });
