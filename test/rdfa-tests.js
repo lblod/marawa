@@ -216,13 +216,13 @@ describe( 'Rdfa test suite', function() {
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0014.html'});
-    const triples = flatten(blocks.map(b => b.context))
-    assert.strictEqual(triples.length, 1)
+    const triples = flatten(blocks.map(b => b.context));
+    assert.strictEqual(triples.length, 1);
     const [firstTriple] = triples;
-    assert.strictEqual(firstTriple.subject, 'http://example.org/foo')
-    assert.strictEqual(firstTriple.predicate, 'http://example.org/bar')
-    assert.strictEqual(firstTriple.object, '10')
-    assert.strictEqual(firstTriple.datatype, 'http://www.w3.org/2001/XMLSchema#integer')
+    assert.strictEqual(firstTriple.subject, 'http://example.org/foo');
+    assert.strictEqual(firstTriple.predicate, 'http://example.org/bar');
+    assert.strictEqual(firstTriple.object, '10');
+    assert.strictEqual(firstTriple.datatype, 'http://www.w3.org/2001/XMLSchema#integer');
   });
 
   it( "Test 0015: meta and link", function() {
@@ -242,7 +242,7 @@ describe( 'Rdfa test suite', function() {
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0015.html'});
-    const triples = flatten(blocks.map(b => b.context))
+    const triples = flatten(blocks.map(b => b.context));
     assert.strictEqual(triples.length, 2);
     
     const firstTriple = {
@@ -250,14 +250,14 @@ describe( 'Rdfa test suite', function() {
       predicate: 'http://purl.org/dc/elements/1.1/creator',
       object: 'Fyodor Dostoevsky'
     }; 
-    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0015.html',
       predicate: 'http://purl.org/dc/elements/1.1/source',
       object: 'urn:isbn:0140449132'
     };
-    assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true)
+    assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
   });
 
   it( "Test 0017: Related blanknodes", function() {
@@ -280,9 +280,10 @@ describe( 'Rdfa test suite', function() {
     const dom = new jsdom.JSDOM(html);
     const domNode = dom.window.document.querySelector('html');
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0017.html'});
-    const triples = flatten(blocks.map(b => b.context))
-    assert.strictEqual(triples.length, 3)
-    //TODO: add tests I don't understand blank nodes
+    const triples = flatten(blocks.map(b => b.context));
+    assert.strictEqual(triples.length, 3);
+    //Blank nodes
+    this.skip();
   });
 
   it( "Test 0018: @rel for predicate", function() {
@@ -424,14 +425,14 @@ describe( 'Rdfa test suite', function() {
       predicate: 'http://purl.org/dc/elements/1.1/creator',
       object: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0025.html#me'
     }; 
-    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true)
+    assert.strictEqual(tripleAppearsInArray(triples, firstTriple), true);
 
     const secondTriple = {
       subject: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0025.html#me',
       predicate: 'http://xmlns.com/foaf/0.1/name',
       object: 'Ben Adida'
     };
-    assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true)
+    assert.strictEqual(tripleAppearsInArray(triples, secondTriple), true);
   });
 
   it( "Test 0026: @content", function() {
@@ -624,6 +625,7 @@ describe( 'Rdfa test suite', function() {
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0033.html'});
     const triples = flatten(blocks.map(b => b.context));
     //TODO: check what we want to do with blank nodes
+    this.skip();
   });
 
   it( "Test 0034: simple img[@src] test", function() {
@@ -729,6 +731,7 @@ describe( 'Rdfa test suite', function() {
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0048.html'});
     const triples = flatten(blocks.map(b => b.context));
     // Todo: blank nodes
+    this.skip();
   });
 
   it( "Test 0049: @typeof with @about, no @rel or @resource", function() {
@@ -784,6 +787,7 @@ describe( 'Rdfa test suite', function() {
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0050.html'});
     const triples = flatten(blocks.map(b => b.context));
     //TODO: Blank nodes
+    this.skip();
   });
 
   it( "Test 0051: @typeof with a single @property", function() {
@@ -1185,6 +1189,7 @@ describe( 'Rdfa test suite', function() {
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0064.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it( "Test 0065: @rel with safe CURIE", function() {
@@ -1213,6 +1218,7 @@ describe( 'Rdfa test suite', function() {
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0065.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it( "Test 0066: @about with @typeof in the head", function() {
@@ -1570,6 +1576,7 @@ describe( 'Rdfa test suite', function() {
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0083.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it( "Test 0084: multiple ways of handling incomplete triples, this time with both @rel and @rev", function() {
@@ -1596,6 +1603,7 @@ describe( 'Rdfa test suite', function() {
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0084.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it( 'Test 0088: Interpretation of the CURIE "_:"', function() {
@@ -1618,6 +1626,7 @@ describe( 'Rdfa test suite', function() {
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0088.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it( 'Test 0089: @src sets a new subject (@typeof)', function() {
@@ -1671,6 +1680,7 @@ describe( 'Rdfa test suite', function() {
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0091.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it( 'Test 0093: Tests XMLLiteral content with explicit @datatype (user-data-typed literal)', function() {
@@ -1766,6 +1776,7 @@ describe( 'Rdfa test suite', function() {
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0104.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it( 'Test 0106: chaining with empty value in inner @rel', function() {
@@ -1787,6 +1798,7 @@ describe( 'Rdfa test suite', function() {
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0106.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it( 'Test 0107: no garbage collecting bnodes : (Negative parser test)', function() {
@@ -1827,6 +1839,7 @@ describe( 'Rdfa test suite', function() {
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0110.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it( 'Test 0111: two bNodes generated after three levels of nesting', function() {
@@ -1850,6 +1863,7 @@ describe( 'Rdfa test suite', function() {
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0111.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it( 'Test 0112: plain literal with datatype=""', function() {
@@ -2173,6 +2187,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0140.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it( 'Test 0174: Support single character prefix in CURIEs', function() {
@@ -2224,6 +2239,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0175.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it( 'Test 0176: IRI for @rel and @rev is allowed', function() {
@@ -2253,6 +2269,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0176.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it( 'Test 0177: Test @prefix', function() {
@@ -2970,6 +2987,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0232.html'});
     const triples = flatten(blocks.map(b => b.context));
     // Blank nodes
+    this.skip();
   });
 
   it('Test 0233: @typeof with @rel and @resource present, no @about (1.1 behavior of 0047)', function() {
@@ -2991,6 +3009,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0233.html'});
     const triples = flatten(blocks.map(b => b.context));
     // Blank nodes
+    this.skip();
   });
 
   it('Test 0246: hanging @rel creates multiple triples, @typeof permutation; RDFa 1.1 version', function() {
@@ -3013,6 +3032,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0246.html'});
     const triples = flatten(blocks.map(b => b.context));
     // Blank nodes
+    this.skip();
   });
 
   it('Test 0247: Multiple incomplete triples, RDFa 1.1version', function() {
@@ -3036,6 +3056,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0247.html'});
     const triples = flatten(blocks.map(b => b.context));
     // Blank nodes
+    this.skip();
   });
 
   it('Test 0248: multiple ways of handling incomplete triples (with @rev); RDFa 1.1 version', function() {
@@ -3059,6 +3080,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0248.html'});
     const triples = flatten(blocks.map(b => b.context));
     // Blank nodes
+    this.skip();
   });
 
   it('Test 0249: multiple ways of handling incomplete triples (with @rel and @rev); RDFa 1.1 version', function() {
@@ -3082,6 +3104,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0249.html'});
     const triples = flatten(blocks.map(b => b.context));
     // Blank nodes
+    this.skip();
   });
 
   it('Test 0250: Checking the right behaviour of @typeof with @about, in presence of @property', function() {
@@ -3914,6 +3937,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0272.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it('Test 0273: time element with @datetime an xsd:time', function() {
@@ -3933,6 +3957,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0273.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it('Test 0274: time element with @datetime an xsd:dateTime', function() {
@@ -3952,6 +3977,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0274.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it('Test 0275: time element with value an xsd:date', function() {
@@ -3971,6 +3997,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0275.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it('Test 0276: time element with value an xsd:time', function() {
@@ -3990,6 +4017,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0276.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it('Test 0277: time element with value an xsd:dateTime', function() {
@@ -4009,6 +4037,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0277.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it('Test 0278: @content overrides @datetime', function() {
@@ -4029,6 +4058,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0278.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it('Test 0279: @datatype used with @datetime overrides default datatype', function() {
@@ -4126,6 +4156,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0282.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it('Test 0284: time element not matching datatype but with explicit @datatype', function() {
@@ -4171,6 +4202,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0287.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it('Test 0289: @href becomes subject when @property and @content are present', function() {
@@ -4464,6 +4496,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0297.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it('Test 0298: @about=[] with @typeof does not create a new object', function() {
@@ -4485,6 +4518,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0298.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it('Test 0299: @resource=[] with @href or @src uses @href or @src (@rel)', function() {
@@ -4556,6 +4590,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0300.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it('Test 0302: @typeof with different content types', function() {
@@ -4655,6 +4690,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0312.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it('Test 0315: @property and @typeof with incomplete triples', function() {
@@ -4679,6 +4715,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0315.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it('Test 0316: @property and @typeof with incomplete triples (@href variant)', function() {
@@ -4703,6 +4740,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0316.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it('Test 0317: @datatype inhibits new @property behavior', function() {
@@ -4771,6 +4809,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0318.html'});
     const triples = flatten(blocks.map(b => b.context));
    // Blank nodes
+   this.skip();
   });
 
   it('Test 0321: rdfa:copy to rdfa:Pattern', function() {
@@ -4793,6 +4832,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0321.html'});
     const triples = flatten(blocks.map(b => b.context));
    // Blank nodes
+   this.skip();
   });
 
   it('Test 0322: rdfa:copy for additional property value', function() {
@@ -4816,6 +4856,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0322.html'});
     const triples = flatten(blocks.map(b => b.context));
    // Blank nodes
+   this.skip();
   });
 
   it('Test 0323: Multiple references to rdfa:Pattern', function() {
@@ -4841,6 +4882,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0323.html'});
     const triples = flatten(blocks.map(b => b.context));
    // Blank nodes
+   this.skip();
   });
 
   it('Test 0324: Multiple references to rdfa:Pattern details', function() {
@@ -4866,6 +4908,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0324.html'});
     const triples = flatten(blocks.map(b => b.context));
    // Blank nodes
+   this.skip();
   });
 
   it('Test 0325: Multiple references to rdfa:Pattern creating a resource', function() {
@@ -4892,6 +4935,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0324.html'});
     const triples = flatten(blocks.map(b => b.context));
    // Blank nodes
+   this.skip();
   });
 
   it('Test 0325: Multiple references to rdfa:Pattern creating a resource', function() {
@@ -4916,6 +4960,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0325.html'});
     const triples = flatten(blocks.map(b => b.context));
    // Blank nodes
+   this.skip();
   });
 
   it('Test 0326: rdfa:Pattern removed only if referenced', function() {
@@ -4940,6 +4985,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0326.html'});
     const triples = flatten(blocks.map(b => b.context));
    // Blank nodes
+   this.skip();
   });
 
   it('Test 0327: rdfa:Pattern chaining', function() {
@@ -4973,6 +5019,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0327.html'});
     const triples = flatten(blocks.map(b => b.context));
    // Blank nodes
+   this.skip();
   });
 
   it('Test 0328: @content overrides the content of the time element.', function() {
@@ -5006,6 +5053,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0328.html'});
     const triples = flatten(blocks.map(b => b.context));
    // Blank nodes
+   this.skip();
   });
 
   it('Test 0329: Recursive triple generation', function() {
@@ -5067,6 +5115,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0330.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it('Test 0331: @datatype overrides inherited @lang, with @content', function() {
@@ -5086,6 +5135,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0331.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it("Test 0332: Empty @datatype doesn't override inherited @lang, with @content", function() {
@@ -5105,6 +5155,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0332.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it("Test 0333: @content overrides @datetime (with @datatype specified)", function() {
@@ -5124,6 +5175,7 @@ whitespace     preserved
     const blocks = analyse(domNode, [], {documentUrl: 'http://rdfa.info/test-suite/test-cases/rdfa1.1/html5/0333.html'});
     const triples = flatten(blocks.map(b => b.context));
     //Blank nodes
+    this.skip();
   });
 
   it("Test 0334: @resource changes the current subject for the nested elements", function() {
