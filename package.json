@@ -3,8 +3,8 @@
   "version": "0.8.0-beta.2",
   "module": "src",
   "scripts": {
-    "test": "mocha --require babel-core/register",
-    "debug-test": "mocha --require babel-core/register -w --inspect=0.0.0.0:9229",
+    "test": "mocha --require @babel/register",
+    "debug-test": "mocha --require @babel/register -w --inspect=0.0.0.0:9229",
     "prepare": "rm -rf dist && babel src --out-dir ./",
     "prepublish": "rm -rf dist && babel src --out-dir ./"
   },
@@ -37,6 +37,9 @@
     "@babel/cli": "^7.14.3",
     "@babel/core": "^7.14.3",
     "@babel/preset-env": "^7.14.2",
-    "babel-plugin-add-module-exports": "^1.0.4"
+    "@babel/register": "^7.13.16",
+    "babel-plugin-add-module-exports": "^1.0.4",
+    "jsdom": "^16.6.0",
+    "mocha": "^8.4.0"
   }
 }
