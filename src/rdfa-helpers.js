@@ -3,7 +3,7 @@
  */
 import { defaultPrefixes } from './support/rdfa-config';
 import RdfaAttributes from './rdfa-attributes';
-
+import Triple from './triple';
 /**
  * Enriches a rich node with semantic properties:
  * - rdfaPrefixes: map of prefixes at the current node
@@ -188,13 +188,13 @@ function rdfaAttributesToTriples(rdfaAttributes) {
   // reverse inverse triples
   graph = graph.map( function(triple) {
     if (triple.predicate.startsWith('^')) {
-      return {
+      return new Triple({
         subject: triple.object,
         predicate: triple.predicate.slice(1),
         object: triple.subject
-      };
+      });
     } else {
-      return triple;
+      return new Triple(triple);
     }
   });
 
