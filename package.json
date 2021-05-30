@@ -32,7 +32,10 @@
   },
   "homepage": "https://github.com/redpencilio/lblod#readme",
   "description": "",
-  "dependencies": {},
+  "dependencies": {
+    "@rdfjs/data-model": "^1.2.0",
+    "@rdfjs/dataset": "^1.1.0"
+  },
   "devDependencies": {
     "@babel/cli": "^7.14.3",
     "@babel/core": "^7.14.3",
