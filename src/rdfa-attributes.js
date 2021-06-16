@@ -13,6 +13,18 @@ import { resolvePrefix } from './rdfa-helpers';
  * @constructor
 */
 class RdfaAttributes {
+  typeof;
+  properties;
+  rel;
+  rev;
+  src;
+  href;
+  resource;
+  about;
+  datatype;
+  text;
+  documentUrl;
+  currentPrefixes;
 
   constructor(domNode, knownPrefixes = defaultPrefixes, options = {}) {
     if (domNode && domNode.getAttribute) {
@@ -44,6 +56,15 @@ class RdfaAttributes {
    */
   get isEmpty() {
     return rdfaKeywords.find( key => this[`_${key}`] != null ) == null;
+  }
+
+  get language() {
+    if (this["_xml:lang"] || this._lang) {
+      return this["_xml:lang"] || this._lang;
+    }
+    else {
+      return null;
+    }
   }
 
   /**

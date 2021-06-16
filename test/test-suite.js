@@ -1,4 +1,5 @@
 import { analyse } from '../src/rdfa-context-scanner';
+import RdfaAttributes from '../src/rdfa-attributes';
 import jsdom from 'jsdom';
 
 var assert = require('assert');
@@ -47,6 +48,20 @@ describe( 'Test suite', function() {
       const topDomNode = dom.window.document.querySelector('body');
       const analysis = analyse( topDomNode );
       assert.ok( analysis, "We should have a parsed state" );
+    });
+  });
+  describe("rdfaAttributes", function() {
+    it("correctly extracts language from the lang attribute", function() {
+      const dom = new jsdom.JSDOM( `<span property="dcterms:title" lang="nl">Aad</span>` );
+      const node =  dom.window.document.querySelector('span');
+      const attrs = new RdfaAttributes(node);
+      assert.equal(attrs.language, "nl");
+    });
+    it("correctly extracts language from the xml:lang attribute", function() {
+      const dom = new jsdom.JSDOM( `<span property="dcterms:title" xml:lang="nl">Aad</span>` );
+      const node =  dom.window.document.querySelector('span');
+      const attrs = new RdfaAttributes(node);
+      assert.equal(attrs.language, "nl");
     });
   });
 });
