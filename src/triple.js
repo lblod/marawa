@@ -38,7 +38,7 @@ export default class Triple {
       obj = `${sparqlEscapeString(this.object)}@${this.language}`;
     }
     else if (this.datatype) {
-      obj = `${sparqlEscapeString(this.object)}@^^${sparqlEscapeUri(this.datatype)}`;
+      obj = `${sparqlEscapeString(this.object)}^^${sparqlEscapeUri(this.datatype)}`;
     }
     else {
       obj = sparqlEscapeString(this.object);
