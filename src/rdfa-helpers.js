@@ -144,14 +144,15 @@ function rdfaAttributesToTriples(rdfaAttributes) {
       if (rdfa['resource'] || rdfa['href'] || rdfa['src']) {
         triple.datatype = 'http://www.w3.org/2000/01/rdf-schema#Resource';
       }
-      else if (rdfa['datatype']) {
-        // TODO verify if datatype takes precedence over language
-        triple.datatype = rdfa['datatype'];
-      }
       else if (rdfa['language']) {
+        // language takes precedence over datatype, if a lang is specified it must be a langString
         triple.datatype = "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString";
         triple.language = rdfa['language'];
       }
+      else if (rdfa['datatype']) {
+        triple.datatype = rdfa['datatype'];
+      }
+
     });
 
     graph = [...graph, ...propertyTriples];
