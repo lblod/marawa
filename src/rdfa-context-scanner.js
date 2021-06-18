@@ -2,7 +2,6 @@ import { walk, isVoidElement } from './node-walker';
 import { enrichWithRdfaProperties, rdfaAttributesToTriples } from './rdfa-helpers';
 import RdfaBlock from './rdfa-block';
 import RichNode from './rich-node';
-// TODO: Research a way to alter the imports when used in an Ember application
 
 /**
  * Scanner of the RDFa context of DOM nodes

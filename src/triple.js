@@ -1,3 +1,5 @@
+import RdfFactory from '@rdfjs/data-model';
+
 function sparqlEscapeString( value ){
   return '"""' + value.replace(/[\\"]/g, function(match) { return '\\' + match; }) + '"""';
 };
@@ -5,6 +7,7 @@ function sparqlEscapeString( value ){
 function sparqlEscapeUri( value ){
   return '<' + value.replace(/[\\"']/g, function(match) { return '\\' + match; }) + '>';
 };
+
 
 export default class Triple {
   subject;
@@ -44,5 +47,23 @@ export default class Triple {
       obj = sparqlEscapeString(this.object);
     }
     return `${sparqlEscapeUri(this.subject)} ${predicate} ${obj} .`;
+  }
+
+  /**
+   * returns a rdfjs compliant quad
+   */
+  toQuad() {
+    let object;
+    if (this.datatype === 'http://www.w3.org/2000/01/rdf-schema#Resource') {
+      object = RdfFactory.namedNode(this.object);
+    }
+    else {
+      object = RdfFactory.literal(this.object, this.datatype);
+    }
+    return RdfFactory.quad(
+      RdfFactory.namedNode(this.subject),
+      RdfFactory.namedNode(this.predicate),
+      object
+    );
   }
 }
