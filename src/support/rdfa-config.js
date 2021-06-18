@@ -7,7 +7,9 @@ const prefixableRdfaKeywords = [
   'href',
   'resource',
   'about',
-  'datatype'
+  'datatype',
+  'lang',
+  'xml:lang'
 ];
 
 const rdfaKeywords = [

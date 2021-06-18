@@ -141,10 +141,18 @@ function rdfaAttributesToTriples(rdfaAttributes) {
 
     propertyTriples.forEach(function(triple) {
       triple.object = rdfa['content'] || rdfa['resource'] || rdfa['href'] || rdfa['src'] || rdfa['text'];
-      if (rdfa['resource'] || rdfa['href'] || rdfa['src'])
+      if (rdfa['resource'] || rdfa['href'] || rdfa['src']) {
         triple.datatype = 'http://www.w3.org/2000/01/rdf-schema#Resource';
-      else
+      }
+      else if (rdfa['language']) {
+        // language takes precedence over datatype, if a lang is specified it must be a langString
+        triple.datatype = "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString";
+        triple.language = rdfa['language'];
+      }
+      else if (rdfa['datatype']) {
         triple.datatype = rdfa['datatype'];
+      }
+
     });
 
     graph = [...graph, ...propertyTriples];
@@ -171,7 +179,7 @@ function rdfaAttributesToTriples(rdfaAttributes) {
           subject: rdfa['resource'] || rdfa['about'], // create a blank node if subject == null
           predicate: 'a',
           object: type,
-          datatype: 'http://www.w3.org/2000/01/rdf-schema#Resource'
+          datatype: 'http://www.w3.org/2000/01/rdf-schema#Resource',
         };
       });
     }
@@ -191,7 +199,8 @@ function rdfaAttributesToTriples(rdfaAttributes) {
       return new Triple({
         subject: triple.object,
         predicate: triple.predicate.slice(1),
-        object: triple.subject
+        object: triple.subject,
+        datatype: 'http://www.w3.org/2000/01/rdf-schema#Resource'
       });
     } else {
       return new Triple(triple);
