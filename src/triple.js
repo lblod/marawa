@@ -14,6 +14,7 @@ export default class Triple {
   predicate;
   object;
   datatype;
+  language;
 
   constructor({ subject, predicate, object, datatype, language = null}) {
     this.subject = subject;
@@ -28,7 +29,7 @@ export default class Triple {
       && this.predicate === other.predicate
       && this.object === other.object
       && this.datatype === other.datatype
-      && this.language === this.language;
+      && this.language === other.language;
   }
 
   toNT() {
