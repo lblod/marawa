@@ -1,6 +1,6 @@
 var assert = require('assert');
-var Triple = require('../triple');
-var RdfaBlock = require('../rdfa-block');
+var Triple = require('../src/triple');
+var RdfaBlock = require('../src/rdfa-block');
 var factory = require('@rdfjs/data-model');
 
 describe( 'rdfjs support', function() {
@@ -18,7 +18,6 @@ describe( 'rdfjs support', function() {
         factory.namedNode("http://purl.org/dc/terms/subject"),
         factory.namedNode("http://other-example.org/")
       );
-      console.log(returned);
       assert(returned.equals(expected));
     });
   });
